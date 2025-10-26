@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Cadastro de Usuário - Viaturas</title>
+<link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/codjr/br/refs/heads/main/heraldica-8DN.png">
+
+</head>
+<body class="centered">
+  <div class="card narrow">
+    <img class="logo" src="https://raw.githubusercontent.com/codjr/br/refs/heads/main/heraldica-8DN.png" alt="Marinha do Brasil">
+    <h2>Cadastro de Usuário</h2>
+
+    <input type="text" id="nome" placeholder="Nome completo" required>
+    <input type="email" id="email" placeholder="Email institucional" required>
+    <input type="password" id="senha" placeholder="Senha" required>
+
+    <select id="role" required>
+      <option value="">Selecione o cargo</option>
+      <option value="motorista">Motorista</option>
+      <option value="aux_encarregado">Auxiliar do Encarregado</option>
+      <option value="encarregado">Encarregado</option>
+      <option value="ose">Oficial de Serviço</option>
+      <option value="chefe">Chefe de Departamento</option>
+      <option value="adm">Administrador</option>
+    </select>
+
+    <button class="primary" onclick="cadastrar()">Cadastrar</button>
+    <p class="hint"><a href="index.html">Já tem conta? Faça login</a></p>
+  </div>
+
+<style>
+
+:root {
+  --azul-marinha: #004aad;
+  --azul-hover: #003b8e;
+  --fundo: #f5f7fa;
+  --texto: #1f2937;
+  --branco: #ffffff;
+  --borda: #d1d5db;
+  --sombra: rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+  background: linear-gradient(135deg, var(--azul-marinha), #0a58ca);
+  color: var(--texto);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* ===== CARD CENTRAL ===== */
+.card {
+  background: var(--branco);
+  border-radius: 12px;
+  box-shadow: 0 6px 20px var(--sombra);
+  padding: 40px 30px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px); /* Aumentei o efeito para dar mais ênfase */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card.narrow {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* ===== LOGO ===== */
+.logo {
+  width: 90px;
+  height: auto;
+  margin-bottom: 15px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* ===== TÍTULO ===== */
+h2 {
+  color: var(--azul-marinha);
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+/* ===== INPUTS E SELECT ===== */
+input, select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 14px;
+  border: 1px solid var(--borda);
+  border-radius: 8px;
+  font-size: 15px;
+  background-color: #f9fafb;
+  transition: 0.3s;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--azul-marinha);
+  box-shadow: 0 0 0 3px rgba(0, 74, 173, 0.2);
+}
+
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg fill='%23004aad' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+/* ===== BOTÃO ===== */
+button.primary {
+  width: 100%;
+  background-color: var(--azul-marinha);
+  color: var(--branco);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.2s ease;
+}
+
+button.primary:hover {
+  background-color: var(--azul-hover);
+  transform: scale(1.05); /* Efeito de aumentar o botão */
+}
+
+/* ===== LINK ===== */
+p.hint {
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+p.hint a {
+  color: var(--azul-marinha);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+p.hint a:hover {
+  text-decoration: underline;
+}
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 480px) {
+  .card {
+    padding: 30px 20px;
+    max-width: 90%; /* Garante que o card ocupe bem a tela em dispositivos menores */
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  input, button, select {
+    font-size: 14px;
+  }
+
+  .logo {
+    width: 80px; /* Ajustando o logo para ser um pouco menor em telas pequenas */
+  }
+}
+
+</style>
+
+
+<script type="module">
+import { auth, db } from "./firebase-config.js";
+import { createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+window.cadastrar = async ()=>{
+  const nome = document.getElementById("nome").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const senha = document.getElementById("senha").value;
+  const role = document.getElementById("role").value;
+
+  if(!nome || !email || !senha || !role){ alert("Preencha todos os campos."); return; }
+
+  try{
+    const cred = await createUserWithEmailAndPassword(auth, email, senha);
+    await setDoc(doc(db,"usuarios", cred.user.uid), {
+      nome, email, role, aprovado: false, criado_em: serverTimestamp()
+    });
+    alert("Cadastro enviado! Aguarde aprovação do ADM.");
+    window.location.href = "index.html";
+  }catch(e){
+    alert("Erro no cadastro: " + (e.message || e));
+  }
+};
+</script>
+</body>
+</html>

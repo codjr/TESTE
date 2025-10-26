@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chefe de Departamento - Dashboard</title>
+<link rel="icon" type="image/svg+xml"
+      href="https://upload.wikimedia.org/wikipedia/commons/a/ad/Coat_of_arms_of_the_Brazilian_Navy.svg">
+
+<!-- 🧁 SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+:root {
+  --cor-primaria: #004aad;
+  --cor-primaria-hover: #003b8e;
+  --cor-fundo: #f5f7fa;
+  --cor-texto: #1f2937;
+  --cor-card: #fff;
+  --cor-borda: #d1d5db;
+  --cor-secundaria: #e2e8f0;
+  --cor-sucesso: #16a34a;
+  --cor-erro: #dc2626;
+  --cor-aviso: #f59e0b;
+  --cor-sombra: rgba(0, 0, 0, 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cor-fundo: #0b1120;
+    --cor-card: #111827;
+    --cor-texto: #e5e7eb;
+    --cor-borda: #1f2937;
+    --cor-secundaria: #1e293b;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  min-height: 100vh;
+  padding: 30px 10px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  background: var(--cor-card);
+  border-radius: 10px;
+  box-shadow: 0 4px 18px var(--cor-sombra);
+  padding: 30px;
+  transition: all 0.3s ease;
+}
+
+.container:hover {
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.2);
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+header h1 {
+  color: var(--cor-primaria);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+header button {
+  background: var(--cor-erro);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+header button:hover {
+  background: #b91c1c;
+  transform: scale(1.05);
+}
+
+h2 {
+  color: var(--cor-primaria);
+  margin-top: 0;
+  border-left: 4px solid var(--cor-primaria);
+  padding-left: 10px;
+}
+
+nav.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+nav.filtros button {
+  background: var(--cor-secundaria);
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+nav.filtros button.ativo {
+  background: var(--cor-primaria);
+  color: #fff;
+}
+
+nav.filtros button:hover {
+  background: var(--cor-primaria-hover);
+  color: #fff;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+thead {
+  background: var(--cor-primaria);
+  color: #fff;
+}
+
+th,
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--cor-borda);
+  text-align: left;
+}
+
+tbody tr:hover {
+  background: rgba(0, 74, 173, 0.05);
+  transition: background 0.3s ease;
+}
+
+button.assinar {
+  background: var(--cor-sucesso);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button.assinar:hover {
+  background: #15803d;
+  transform: scale(1.05);
+}
+
+.badge-ok {
+  background: rgba(22, 163, 74, 0.12);
+  color: #166534;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.badge-no {
+  background: rgba(220, 38, 38, 0.12);
+  color: #991b1b;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.badge-end {
+  background: rgba(59, 130, 246, 0.12);
+  color: #1e40af;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.tag-fp {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  th,
+  td {
+    font-size: 0.9rem;
+  }
+
+  header {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  nav.filtros {
+    justify-content: center;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Chefe de Departamento – Painel de Missões</h1>
+    <button onclick="logout()">Sair</button>
+  </header>
+
+  <h2>Missões</h2>
+
+  <!-- 🔍 Filtros -->
+  <nav class="filtros">
+    <button class="ativo" onclick="filtrar('todas')">Todas</button>
+    <button onclick="filtrar('pendentes')">Pendentes</button>
+    <button onclick="filtrar('assinadas')">Assinadas</button>
+    <button onclick="filtrar('concluidas')">Concluídas</button>
+    <button onclick="filtrar('Finalizada')">Finalizada</button>
+  </nav>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Missão</th>
+        <th>Motorista</th>
+        <th>Viatura</th>
+        <th>Odômetro Início</th>
+        <th>Odômetro Fim</th>
+        <th>Status</th>
+        <th>Fora Prog.</th>
+        <th>Assinaturas</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="missoes-body"></tbody>
+  </table>
+</div>
+
+<script type="module">
+import {auth,db} from "./firebase-config.js";
+import {signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import {collection,onSnapshot,doc,updateDoc} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+let missoes = [];
+let filtroAtual = "todas";
+
+/* 🔒 Proteção de sessão */
+const LIMITE=10*60*1000;let timer;
+onAuthStateChanged(auth,u=>{
+  if(!u){window.location.href="index.html";}
+  else{
+    resetar();
+    ["mousemove","keydown","click","scroll"].forEach(e=>document.addEventListener(e,resetar));
+    carregarMissoes(u);
+  }
+});
+function resetar(){
+  clearTimeout(timer);
+  timer=setTimeout(async()=>{
+    Swal.fire("Sessão Expirada","Por segurança, sua sessão foi encerrada.","warning");
+    await signOut(auth);
+    window.location.href="index.html";
+  },LIMITE);
+}
+window.logout=async()=>{
+  await signOut(auth);
+  window.location.href="index.html";
+};
+
+/* 🔄 Carregar em tempo real */
+function carregarMissoes(user){
+  const tb=document.getElementById("missoes-body");
+  onSnapshot(collection(db,"viaturas_missao"),snap=>{
+    missoes = [];
+    tb.innerHTML="";
+    snap.forEach(d=>{
+      missoes.push({id:d.id,...d.data()});
+    });
+    renderizar(user);
+  });
+}
+
+/* 🧩 Renderizar tabela */
+function renderizar(user){
+  const tb=document.getElementById("missoes-body");
+  tb.innerHTML="";
+  const filtradas = missoes.filter(m=>{
+    if(filtroAtual==="pendentes") return !m.assinatura_chedep && m.status!=="Concluída";
+    if(filtroAtual==="assinadas") return m.assinatura_chedep && m.status!=="Concluída";
+    if(filtroAtual==="concluidas") return m.status==="Concluída";
+    return true;
+  });
+
+  filtradas.forEach(m=>{
+    const tr=document.createElement("tr");
+    const foraProg = m.fora_programacao ? "<span class='tag-fp'>⚠️</span>" : "-";
+    let badge = `<span class='badge-no'>${m.status||"Pendente"}</span>`;
+    if(m.status?.includes("Autorizada")) badge = `<span class='badge-ok'>${m.status}</span>`;
+    if(m.status==="Concluída") badge = `<span class='badge-end'>Concluída</span>`;
+
+    const nomeViatura = m.viatura_nome || m.viatura_label || m.viatura || "-";
+
+    tr.innerHTML=`
+      <td>${m.missao||""}</td>
+      <td>${m.motorista||""}</td>
+      <td>${nomeViatura}</td>
+      <td>${m.odometro_inicio||"-"}</td>
+      <td>${m.odometro_fim||"-"}</td>
+      <td>${badge}</td>
+      <td>${foraProg}</td>
+      <td>
+        <div style="font-size:.9rem;line-height:1.4;">
+          <b>OSE:</b> ${m.assinatura_ose||"-"}<br>
+          <b>Enc.:</b> ${m.assinatura_encarregado||"-"}<br>
+          <b>Chefe:</b> ${m.assinatura_chedep||"-"}
+        </div>
+      </td>
+      <td>
+        ${
+          !m.assinatura_chedep && m.status!=="Concluída"
+          ? `<button class="assinar" onclick="assinarMissao('${m.id}','${user.email||"Chefe"}')">Assinar</button>`
+          : "-"
+        }
+      </td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+/* 🧭 Filtro */
+window.filtrar = (tipo) => {
+  filtroAtual = tipo;
+  document.querySelectorAll("nav.filtros button").forEach(b=>b.classList.remove("ativo"));
+  event.target.classList.add("ativo");
+  renderizar(auth.currentUser);
+};
+
+/* ✍️ Assinar missão */
+window.assinarMissao = async (id, nome) => {
+  const confirm = await Swal.fire({
+    title: "Assinar Missão?",
+    text: "Confirma a assinatura digital desta missão?",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonText: "Sim, assinar",
+    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#16a34a",
+    cancelButtonColor: "#dc2626"
+  });
+  if (confirm.isConfirmed) {
+    try {
+      const ref = doc(db, "viaturas_missao", id);
+      await updateDoc(ref, {
+        assinatura_chedep: nome,
+        status: "Autorizada pelo Chefe"
+      });
+      Swal.fire("Assinada!","Missão assinada com sucesso.","success");
+    } catch (e) {
+      Swal.fire("Erro","Não foi possível assinar a missão.","error");
+      console.error(e);
+    }
+  }
+};
+</script>
+</body>
+</html>

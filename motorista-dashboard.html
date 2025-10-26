@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Motorista / ADM - Dashboard</title>
+
+<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/codjr/br/refs/heads/main/heraldica-8DN.png">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Inter", "Segoe UI", Roboto, sans-serif;
+}
+
+body {
+  background: linear-gradient(180deg, #e9ecf4 0%, #f5f7fa 100%);
+  color: #1b1b1b;
+  min-height: 100vh;
+}
+
+header {
+  background: #001f3f;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  border-bottom: 5px solid #c9a600;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25);
+}
+
+.logo-marinha {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-marinha img {
+  width: 50px;
+  height: 50px;
+}
+
+header h1 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+header button {
+  background: linear-gradient(145deg, #b30000, #800000);
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+header button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(145deg, #cc0000, #990000);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+.tab-pane {
+  background: #fff;
+  border-radius: 10px;
+  padding: 28px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+h2 {
+  color: #002b5c;
+  margin-bottom: 20px;
+  font-weight: 700;
+  border-left: 6px solid #c9a600;
+  padding-left: 10px;
+}
+
+.filtro-status {
+  margin-bottom: 15px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filtro-status button {
+  border: none;
+  background: #e0e6ef;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #002b5c;
+  transition: 0.2s;
+}
+
+.filtro-status button:hover {
+  background: #cfd8e3;
+}
+
+.filtro-status button.ativo {
+  background: #002b5c;
+  color: #fff;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 8px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+thead {
+  background: #002b5c;
+  color: #fff;
+}
+
+th, td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+tbody tr:hover {
+  background: #f7f9fc;
+  transition: 0.2s;
+}
+
+tr.status-aprovada td {
+  background: #fffbea;
+}
+
+tr.status-em td {
+  background: #e3f2fd;
+}
+
+tr.status-concluida td {
+  background: #e8f5e9;
+}
+
+tr.status-pendente td {
+  background: #ffebee;
+}
+
+button.inicio, button.fim {
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: 600;
+  color: #fff;
+}
+
+button.inicio {
+  background: #1565c0;
+}
+
+button.inicio:hover {
+  background: #0d47a1;
+  transform: scale(1.05);
+}
+
+button.fim {
+  background: #2e7d32;
+}
+
+button.fim:hover {
+  background: #1b5e20;
+  transform: scale(1.05);
+}
+
+.small {
+  font-size: 0.85rem;
+  color: #444;
+  background: #fefefe;
+  padding: 10px 12px;
+  border-left: 4px solid #002b5c;
+  border-radius: 6px;
+  margin-top: 14px;
+}
+
+@media (max-width: 900px) {
+  header {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  table th, table td {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+}
+
+</style>
+
+</head>
+
+<body>
+<header>
+  <div class="logo-marinha">
+    <img src="https://raw.githubusercontent.com/codjr/br/refs/heads/main/heraldica-8DN.png" alt="Marinha do Brasil">
+    <h1>Painel — Motorista / ADM</h1>
+  </div>
+  <button onclick="logout()">Sair</button>
+</header>
+
+<div class="container">
+  <div class="tab-pane">
+    <h2>Missões</h2>
+
+    <div class="filtro-status">
+      <button class="ativo" onclick="filtrar('todas', event)">Todas</button>
+      <button onclick="filtrar('Aprovada pela OSE', event)">Aprovadas</button>
+      <button onclick="filtrar('Em viagem', event)">Em viagem</button>
+      <button onclick="filtrar('Concluída', event)">Concluídas</button>
+      <button onclick="filtrar('Pendente', event)">Pendentes</button>
+      <button onclick="filtrar('Finalizada', event)">Finalizada</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Missão</th>
+            <th>Motorista</th>
+            <th>Viatura</th>
+            <th>Status</th>
+            <th>Odômetro Início</th>
+            <th>Horário Início</th>
+            <th>Odômetro Fim</th>
+            <th>Horário Fim</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="missoes-body"></tbody>
+      </table>
+    </div>
+
+    <p class="small">
+      • Motoristas veem apenas suas missões. Administradores veem todas.<br>
+      • O odômetro inicial é sempre o último <b>odômetro final</b> da viatura.
+    </p>
+  </div>
+</div>
+
+<script type="module">
+import {auth, db} from "./firebase-config.js";
+import {signOut, onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import {
+  collection, doc, getDoc, getDocs, updateDoc, onSnapshot, query, where, orderBy, limit, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+
+let EU=null, missoesGlobais=[], ROLE="";
+
+/* ================= Proteção + Sessão ================= */
+const TIMEOUT = 10*60*1000; let t;
+onAuthStateChanged(auth, async (u)=>{
+  if(!u){return window.location.href="index.html";}
+  const uDoc = await getDoc(doc(db,"usuarios",u.uid));
+  if(!uDoc.exists()){await signOut(auth);return window.location.href="index.html";}
+  ROLE = uDoc.data().role;
+  if(ROLE!=="motorista" && ROLE!=="adm"){
+    Swal.fire("Acesso negado","Painel restrito a Motoristas e Administradores","error");
+    await signOut(auth);
+    return window.location.href="index.html";
+  }
+  EU=u;
+  carregarMissoes();
+  resetTimer();
+  ["mousemove","keydown","click","scroll"].forEach(evt=>document.addEventListener(evt,resetTimer));
+});
+function resetTimer(){
+  clearTimeout(t);
+  t=setTimeout(async()=>{
+    Swal.fire("Sessão expirada","Você ficou inativo por muito tempo","warning");
+    await signOut(auth);window.location.href="index.html";
+  },TIMEOUT);
+}
+window.logout=async()=>{
+  const s=await Swal.fire({title:"Sair do sistema?",icon:"question",showCancelButton:true,confirmButtonText:"Sim, sair"});
+  if(s.isConfirmed){await signOut(auth);window.location.href="index.html";}
+};
+
+/* ================= Carregar Missões ================= */
+async function carregarMissoes(){
+  let q;
+  if(ROLE==="adm"){
+    q=query(collection(db,"viaturas_missao"));
+  }else{
+    q=query(collection(db,"viaturas_missao"),where("motorista","==",auth.currentUser.email));
+  }
+  onSnapshot(q,(snap)=>{
+    missoesGlobais=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderMissoes("todas");
+  });
+}
+
+/* ================= Filtro ================= */
+window.filtrar=function(filtro,evt){
+  document.querySelectorAll(".filtro-status button").forEach(b=>b.classList.remove("ativo"));
+  evt.target.classList.add("ativo");
+  renderMissoes(filtro);
+}
+
+function renderMissoes(filtro){
+  const tb=document.getElementById("missoes-body");
+  tb.innerHTML="";
+  const filtradas=missoesGlobais.filter(m=>{
+    if(filtro==="todas") return true;
+    if(filtro==="Pendente") return !m.status || m.status.includes("Pendente") || m.status.includes("Aguardando");
+    return m.status===filtro;
+  });
+
+  filtradas.forEach(m=>{
+    const podeIniciar=!m.horario_inicio;
+    const podeFinalizar=!!m.horario_inicio && !m.odometro_fim;
+    const status=(m.status||"Pendente");
+    let classeStatus="status-pendente";
+    if(status.includes("Aprovada")) classeStatus="status-aprovada";
+    else if(status.includes("Em viagem")) classeStatus="status-em";
+    else if(status.includes("Concluída")) classeStatus="status-concluida";
+
+    const tr=document.createElement("tr");
+    tr.className=classeStatus;
+    tr.innerHTML=`
+      <td>${m.missao||"-"}</td>
+      <td>${m.motorista||"-"}</td>
+      <td>${m.viatura_nome||m.viatura||"-"}</td>
+      <td>${status}</td>
+      <td>${m.odometro_inicio??"-"}</td>
+      <td>${m.horario_inicio??"-"}</td>
+      <td>${m.odometro_fim??"-"}</td>
+      <td>${m.horario_fim??"-"}</td>
+      <td>
+        ${podeIniciar?`<button class="inicio" onclick="registrarInicio('${m.id}','${m.viatura}')">Início</button>`:""}
+        ${podeFinalizar?`<button class="fim" onclick="registrarFim('${m.id}','${m.viatura}')">Fim</button>`:""}
+      </td>`;
+    tb.appendChild(tr);
+  });
+}
+
+/* ================= Registrar Início ================= */
+window.registrarInicio=async(id,viaturaID)=>{
+  const ref=doc(db,"viaturas_missao",id);
+  const dSnap=await getDoc(ref);
+  if(!dSnap.exists()) return Swal.fire("Erro","Missão não encontrada","error");
+  const m=dSnap.data();
+  if(m.horario_inicio) return Swal.fire("Aviso","Início já registrado","info");
+
+  let ultimoOdo=null;
+
+  // busca última missão concluída da mesma viatura
+  const ultimas=query(collection(db,"viaturas_missao"),where("viatura","==",viaturaID),where("status","==","Concluída"),orderBy("atualizado_em","desc"),limit(1));
+  const ultSnap=await getDocs(ultimas);
+  if(!ultSnap.empty) ultimoOdo=ultSnap.docs[0].data().odometro_fim||null;
+
+  // se não achou missão concluída, busca odômetro atual da viatura
+  if(!ultimoOdo && viaturaID){
+    try{
+      const vtrDoc=await getDoc(doc(db,"viaturas",viaturaID));
+      if(vtrDoc.exists()) ultimoOdo=vtrDoc.data().odometro_atual||vtrDoc.data().odometro||null;
+    }catch(e){console.warn("Erro ao buscar odômetro:",e);}
+  }
+
+  if(!ultimoOdo){
+    const {value:valor}=await Swal.fire({title:"Odômetro inicial",input:"number",inputLabel:"Digite o odômetro inicial",showCancelButton:true});
+    if(!valor) return;
+    ultimoOdo=Number(valor);
+  }
+
+  const confirmar=await Swal.fire({
+    title:"Confirmar início da missão?",
+    html:`O sistema registrará o odômetro inicial como <b>${ultimoOdo}</b>.`,
+    icon:"question",showCancelButton:true,confirmButtonText:"Confirmar",cancelButtonText:"Cancelar"
+  });
+  if(!confirmar.isConfirmed) return;
+
+  await updateDoc(ref,{
+    odometro_inicio:ultimoOdo,
+    horario_inicio:new Date().toLocaleString(),
+    motorista_inicio:auth.currentUser.email,
+    status:"Em viagem",
+    atualizado_em:serverTimestamp()
+  });
+
+  // atualiza o odômetro atual da viatura
+  if(viaturaID){
+    try{await updateDoc(doc(db,"viaturas",viaturaID),{odometro_atual:ultimoOdo,atualizado_em:serverTimestamp()});}catch(e){console.warn("Erro ao atualizar viatura:",e);}
+  }
+
+  Swal.fire("📍 Início registrado","Boa viagem!","success");
+};
+
+/* ================= Registrar Fim ================= */
+window.registrarFim=async(id,viaturaID)=>{
+  const ref=doc(db,"viaturas_missao",id);
+  const dSnap=await getDoc(ref);
+  if(!dSnap.exists()) return Swal.fire("Erro","Missão não encontrada","error");
+  const m=dSnap.data();
+  if(!m.odometro_inicio) return Swal.fire("Erro","Registre o início antes de finalizar","error");
+  if(m.odometro_fim) return Swal.fire("Aviso","Fim já registrado","info");
+
+  const {value:valor}=await Swal.fire({title:"Registrar Fim",input:"number",inputLabel:"Digite o odômetro final",showCancelButton:true});
+  if(!valor) return;
+  const odo=Number(valor);
+  if(isNaN(odo)||odo<0) return Swal.fire("Erro","Odômetro inválido","error");
+  if(odo<Number(m.odometro_inicio)) return Swal.fire("Erro","Odômetro final não pode ser menor que o inicial ("+m.odometro_inicio+")","error");
+
+  await updateDoc(ref,{
+    odometro_fim:odo,
+    horario_fim:new Date().toLocaleString(),
+    motorista_fim:auth.currentUser.email,
+    status:"Concluída",
+    atualizado_em:serverTimestamp()
+  });
+
+  if(viaturaID){
+    try{
+      await updateDoc(doc(db,"viaturas",viaturaID),{
+        odometro_atual:odo,
+        atualizado_em:serverTimestamp()
+      });
+    }catch(e){console.warn("Erro ao atualizar odômetro:",e);}
+  }
+
+  Swal.fire("✅ Missão concluída","Fim registrado com sucesso","success");
+};
+</script>
+</body>
+</html>

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Relatórios - Sistema de Viaturas</title>
+<link rel="icon" type="image/svg+xml"
+  href="https://upload.wikimedia.org/wikipedia/commons/a/ad/Coat_of_arms_of_the_Brazilian_Navy.svg">
+
+<!-- ✅ SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+:root {
+  --cor-primaria:#004aad;--cor-primaria-hover:#003b8e;
+  --cor-fundo:#f5f7fa;--cor-texto:#1f2937;
+  --cor-card:#fff;--cor-borda:#d1d5db;
+  --cor-secundaria:#e2e8f0;--cor-sucesso:#16a34a;
+  --cor-erro:#dc2626;
+}
+@media(prefers-color-scheme:dark){
+  :root{--cor-fundo:#0b1120;--cor-card:#111827;--cor-texto:#e5e7eb;
+        --cor-borda:#1f2937;--cor-secundaria:#1e293b;}
+}
+*{box-sizing:border-box;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+body{margin:0;background:var(--cor-fundo);color:var(--cor-texto);
+     min-height:100vh;padding:30px 10px;}
+.container{max-width:1200px;margin:auto;background:var(--cor-card);
+           border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.12);padding:30px;}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;flex-wrap:wrap;gap:10px;}
+header h1{color:var(--cor-primaria);font-size:1.5rem;margin:0;}
+header .botoes{display:flex;gap:10px;}
+header button{color:#fff;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-weight:600;}
+header button.logout{background:var(--cor-erro);}
+header button.logout:hover{background:#b91c1c;}
+header button.voltar{background:var(--cor-primaria);}
+header button.voltar:hover{background:var(--cor-primaria-hover);}
+h2{color:var(--cor-primaria);border-left:4px solid var(--cor-primaria);
+   padding-left:10px;margin-top:0;}
+.filtros{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:25px;}
+.filtros select,.filtros input{padding:10px;border:1px solid var(--cor-borda);
+             border-radius:6px;font-size:1rem;}
+button{border:none;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:600;}
+button.gerar{background:var(--cor-primaria);color:#fff;}
+button.gerar:hover{background:var(--cor-primaria-hover);}
+button.csv{background:var(--cor-sucesso);color:#fff;}
+button.csv:hover{background:#15803d;}
+table{width:100%;border-collapse:collapse;margin-top:15px;}
+thead{background:var(--cor-primaria);color:#fff;}
+th,td{padding:10px 12px;border-bottom:1px solid var(--cor-borda);text-align:left;}
+tbody tr:hover{background:rgba(0,74,173,.05);}
+.badge{padding:4px 8px;border-radius:6px;font-weight:700;}
+.badge.ok{background:rgba(22,163,74,.15);color:#166534;}
+.badge.no{background:rgba(220,38,38,.15);color:#991b1b;}
+@media(max-width:768px){
+  .container{padding:20px;}
+  th,td{font-size:.85rem;}
+  table{display:block;overflow-x:auto;white-space:nowrap;}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>📊 Relatórios de Missões</h1>
+    <div class="botoes">
+      <button class="voltar" onclick="voltar()">⬅️ Voltar</button>
+      <button class="logout" onclick="logout()">Sair</button>
+    </div>
+  </header>
+
+  <h2>Filtros</h2>
+  <div class="filtros">
+    <select id="tipo">
+      <option value="diario">Diário</option>
+      <option value="semanal">Semanal</option>
+      <option value="mensal">Mensal</option>
+      <option value="anual">Anual</option>
+      <option value="personalizado">Personalizado</option>
+    </select>
+    <input type="date" id="dataInicio">
+    <input type="date" id="dataFim">
+    <button class="gerar" onclick="gerarRelatorio()">Gerar Relatório</button>
+    <button class="csv" onclick="exportarCSV()">Exportar CSV</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Missão</th>
+        <th>Motorista</th>
+        <th>Viatura</th>
+        <th>Status</th>
+        <th>Odômetro Início</th>
+        <th>Odômetro Fim</th>
+        <th>Odômetro Gasto</th>
+        <th>Tempo de Viagem</th>
+        <th>Criação</th>
+        <th>Encerramento</th>
+      </tr>
+    </thead>
+    <tbody id="tabela-body"></tbody>
+  </table>
+</div>
+
+<script type="module">
+import {auth,db} from "./firebase-config.js";
+import {signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import {collection,getDocs,query,orderBy} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+/* 🔒 Sessão protegida */
+const LIMITE=10*60*1000;let timer;
+onAuthStateChanged(auth,u=>{
+  if(!u){window.location.href="index.html";}
+  else{resetar();}
+  ["mousemove","keydown","click","scroll"].forEach(e=>document.addEventListener(e,resetar));
+});
+function resetar(){
+  clearTimeout(timer);
+  timer=setTimeout(async()=>{
+    Swal.fire({
+      icon:"warning",
+      title:"Sessão expirada",
+      text:"Você será desconectado por inatividade.",
+      confirmButtonColor:"#004aad"
+    }).then(async()=>{
+      await signOut(auth);
+      window.location.href="index.html";
+    });
+  },LIMITE);
+}
+
+/* 🚪 Logout */
+window.logout=async()=>{
+  const c=await Swal.fire({
+    title:"Deseja sair?",
+    text:"Você será desconectado do sistema.",
+    icon:"question",
+    showCancelButton:true,
+    confirmButtonText:"Sim, sair",
+    cancelButtonText:"Cancelar",
+    confirmButtonColor:"#dc2626"
+  });
+  if(c.isConfirmed){
+    await signOut(auth);
+    Swal.fire({
+      icon:"success",
+      title:"Desconectado com sucesso",
+      showConfirmButton:false,
+      timer:1500
+    }).then(()=>window.location.href="index.html");
+  }
+};
+
+/* 🔙 Voltar */
+window.voltar=()=>window.location.href="encarregado-dashboard.html";
+
+/* 📊 Gerar relatório */
+window.gerarRelatorio=async()=>{
+  const tipo=document.getElementById("tipo").value;
+  const tBody=document.getElementById("tabela-body");
+  tBody.innerHTML="<tr><td colspan='10'>Carregando...</td></tr>";
+
+  const snap=await getDocs(query(collection(db,"viaturas_missao"),orderBy("criada_em")));
+  const todas=[];
+  snap.forEach(d=>{
+    const data=d.data();
+    if(data.criada_em) todas.push({...data,id:d.id});
+  });
+
+  const hoje=new Date();
+  let inicio,fim;
+  switch(tipo){
+    case"diario":inicio=new Date(hoje.getFullYear(),hoje.getMonth(),hoje.getDate());
+                 fim=new Date(inicio);fim.setDate(fim.getDate()+1);break;
+    case"semanal":inicio=new Date();inicio.setDate(hoje.getDate()-7);fim=hoje;break;
+    case"mensal":inicio=new Date(hoje.getFullYear(),hoje.getMonth(),1);
+                 fim=new Date(hoje.getFullYear(),hoje.getMonth()+1,1);break;
+    case"anual":inicio=new Date(hoje.getFullYear(),0,1);
+                fim=new Date(hoje.getFullYear()+1,0,1);break;
+    case"personalizado":
+      inicio=new Date(document.getElementById("dataInicio").value);
+      fim=new Date(document.getElementById("dataFim").value);
+      if(!inicio||!fim||inicio>fim){
+        Swal.fire({icon:"error",title:"Período inválido",text:"Verifique as datas selecionadas."});
+        return;
+      }
+      break;
+  }
+
+  const filtradas=todas.filter(m=>{
+    const d=new Date(m.criada_em?.seconds?m.criada_em.toDate():m.criada_em);
+    return d>=inicio && d<=fim;
+  });
+
+  if(!filtradas.length){
+    tBody.innerHTML="<tr><td colspan='10'>Nenhuma missão encontrada.</td></tr>";
+    Swal.fire({icon:"info",title:"Sem resultados",text:"Nenhuma missão encontrada nesse período."});
+    return;
+  }
+
+  tBody.innerHTML="";
+  filtradas.forEach(m=>{
+    const inicio=m.odometro_inicio||0;
+    const fim=m.odometro_fim||0;
+    const gasto=(fim&&inicio)?(fim-inicio):"-";
+    const tempo=m.tempo_viagem||"-";
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td>${m.missao||"-"}</td>
+      <td>${m.motorista||"-"}</td>
+      <td>${m.viatura_nome||"-"}</td>
+      <td>${m.status||"-"}</td>
+      <td>${inicio||"-"}</td>
+      <td>${fim||"-"}</td>
+      <td>${gasto!=="-"?gasto+" km":"-"}</td>
+      <td>${tempo}</td>
+      <td>${m.criada_em?.toDate?new Date(m.criada_em.toDate()).toLocaleString():"-"}</td>
+      <td>${m.horario_fim||"-"}</td>`;
+    tBody.appendChild(tr);
+  });
+
+  window.ultimoRelatorio=filtradas;
+  Swal.fire({icon:"success",title:"Relatório gerado",text:`${filtradas.length} missão(ões) encontradas.`});
+};
+
+/* 💾 Exportar CSV */
+window.exportarCSV=()=>{
+  if(!window.ultimoRelatorio||!window.ultimoRelatorio.length){
+    Swal.fire({icon:"warning",title:"Sem dados",text:"Gere um relatório antes de exportar."});
+    return;
+  }
+
+  const linhas=[["Missão","Motorista","Viatura","Status","Odômetro Início","Odômetro Fim","Odômetro Gasto","Tempo de Viagem","Criação","Encerramento"]];
+  window.ultimoRelatorio.forEach(m=>{
+    const gasto=(m.odometro_fim&&m.odometro_inicio)?(m.odometro_fim-m.odometro_inicio):"";
+    linhas.push([
+      m.missao||"",m.motorista||"",m.viatura_nome||"",m.status||"",
+      m.odometro_inicio||"",m.odometro_fim||"",gasto||"",
+      m.tempo_viagem||"",m.criada_em?.toDate?new Date(m.criada_em.toDate()).toLocaleString():"",
+      m.horario_fim||""
+    ]);
+  });
+  const csv=linhas.map(l=>l.map(v=>`"${v}"`).join(",")).join("\n");
+  const blob=new Blob([csv],{type:"text/csv;charset=utf-8;"});
+  const link=document.createElement("a");
+  link.href=URL.createObjectURL(blob);
+  link.download="relatorio_viaturas.csv";
+  link.click();
+
+  Swal.fire({icon:"success",title:"Exportado",text:"Arquivo CSV baixado com sucesso!"});
+};
+</script>
+</body>
+</html>

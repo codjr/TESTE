@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auxiliar do Encarregado - Dashboard</title>
+<link rel="icon" type="image/svg+xml" 
+      href="https://upload.wikimedia.org/wikipedia/commons/a/ad/Coat_of_arms_of_the_Brazilian_Navy.svg">
+<!-- ✅ SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+
+:root {
+  --cor-primaria: #004aad;
+  --cor-primaria-hover: #003b8e;
+  --cor-fundo: #f5f7fa;
+  --cor-texto: #1f2937;
+  --cor-card: #fff;
+  --cor-borda: #d1d5db;
+  --cor-secundaria: #e2e8f0;
+  --cor-sucesso: #16a34a;
+  --cor-erro: #dc2626;
+  --cor-aviso: #f59e0b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cor-fundo: #0b1120;
+    --cor-card: #111827;
+    --cor-texto: #e5e7eb;
+    --cor-borda: #1f2937;
+    --cor-secundaria: #1e293b;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  min-height: 100vh;
+  padding: 30px 10px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: auto;
+  background: var(--cor-card);
+  border-radius: 10px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+  padding: 30px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+header h1 {
+  color: var(--cor-primaria);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+header button {
+  background: var(--cor-erro);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+header button:hover {
+  background: #b91c1c;
+}
+
+h2 {
+  color: var(--cor-primaria);
+  margin-top: 0;
+  border-left: 4px solid var(--cor-primaria);
+  padding-left: 10px;
+}
+
+nav.menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+nav.menu a {
+  background: var(--cor-primaria);
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+nav.menu a:hover {
+  background: var(--cor-primaria-hover);
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+form input,
+form select {
+  padding: 10px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  font-size: 1rem;
+  flex: 1 1 200px;
+  transition: border 0.3s ease, box-shadow 0.3s ease;
+}
+
+form input:focus,
+form select:focus {
+  outline: none;
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 3px rgba(0, 74, 173, 0.2);
+}
+
+button {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+button.criar {
+  background: var(--cor-primaria);
+  color: #fff;
+}
+
+button.criar:hover {
+  background: var(--cor-primaria-hover);
+  transform: scale(1.05);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+thead {
+  background: var(--cor-primaria);
+  color: #fff;
+}
+
+th, td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--cor-borda);
+  text-align: left;
+}
+
+tbody tr:hover {
+  background: rgba(0, 74, 173, 0.05);
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  th,
+  td {
+    font-size: 0.9rem;
+  }
+
+  form input,
+  form select {
+    flex: 1 1 100%;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  h1 {
+    font-size: 1.3rem;
+  }
+
+  nav.menu {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  button.criar {
+    width: 100%;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Auxiliar do Encarregado - Dashboard</h1>
+    <button onclick="logout()">Sair</button>
+  </header>
+
+  <nav class="menu">
+    <a href="gerenciar-viaturas.html">🚗 Cadastrar/Editar Viaturas</a>
+    <a href="relatorios.html">📊 Relatórios</a>
+  </nav>
+
+  <h2>Criar e Programar Missão</h2>
+  <form onsubmit="event.preventDefault(); criarMissao();">
+    <input type="text" id="missao" placeholder="Descrição da missão" required>
+    <select id="motorista">
+      <option value="">(Opcional) Selecione o motorista</option>
+    </select>
+    <select id="viatura" required onchange="carregarOdometro()">
+      <option value="">Selecione a Viatura</option>
+    </select>
+    <input type="number" id="odometro_inicio" placeholder="Odômetro Inicial (auto)" readonly>
+    <label><input type="checkbox" id="foraProg"> Fora da programação</label>
+    <button type="submit" class="criar">Criar Missão</button>
+  </form>
+
+  <h2>Missões Existentes</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Missão</th><th>Motorista</th><th>Viatura</th>
+        <th>Status</th><th>Odômetro Início</th><th>Odômetro Fim</th>
+        <th>OSE</th><th>Enc.</th><th>Chefe</th>
+      </tr>
+    </thead>
+    <tbody id="missoes-body"></tbody>
+  </table>
+</div>
+
+<script type="module">
+import {auth,db} from "./firebase-config.js";
+import {signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import {collection,onSnapshot,addDoc,getDocs,query,where,orderBy,limit,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+let userAtual=null;
+const LIMITE=10*60*1000;let timer;
+
+/* 🔒 Sessão */
+onAuthStateChanged(auth,u=>{
+  if(!u){window.location.href="index.html";}
+  else{
+    userAtual=u;
+    carregarMotoristas();carregarViaturas();carregarMissoes();
+    resetar();
+    ["mousemove","keydown","click","scroll"].forEach(e=>document.addEventListener(e,resetar));
+  }
+});
+function resetar(){clearTimeout(timer);
+  timer=setTimeout(async()=>{
+    Swal.fire("Sessão expirada","Faça login novamente.","warning");
+    await signOut(auth);window.location.href="index.html";
+  },LIMITE);
+}
+window.logout=async()=>{await signOut(auth);window.location.href="index.html";}
+
+/* 👷 Motoristas */
+async function carregarMotoristas(){
+  const snap=await getDocs(query(collection(db,"usuarios"),where("role","==","motorista"),where("aprovado","==",true)));
+  const sel=document.getElementById("motorista");
+  sel.innerHTML="<option value=''> (Opcional) Selecione o motorista </option>";
+  snap.forEach(d=>{
+    const u=d.data();
+    sel.innerHTML+=`<option value="${u.email}">${u.nome}</option>`;
+  });
+}
+
+/* 🚙 Viaturas */
+async function carregarViaturas(){
+  const sel=document.getElementById("viatura");
+  sel.innerHTML="<option value=''>Selecione a viatura</option>";
+  const snap=await getDocs(collection(db,"viaturas"));
+  snap.forEach(v=>{
+    const d=v.data();
+    const nomeViatura=`${d.identificacao} (${d.modelo})`;
+    sel.innerHTML+=`<option value="${v.id}" data-nome="${nomeViatura}">${nomeViatura}</option>`;
+  });
+}
+
+/* 🔢 Buscar último odômetro */
+window.carregarOdometro=async()=>{
+  const id=document.getElementById("viatura").value;
+  if(!id)return;
+  const input=document.getElementById("odometro_inicio");
+
+  const qMissao=query(collection(db,"viaturas_missao"),where("viatura","==",id),orderBy("criada_em","desc"),limit(1));
+  const snapMissao=await getDocs(qMissao);
+
+  if(!snapMissao.empty){
+    const ultima=snapMissao.docs[0].data();
+    input.value=ultima.odometro_fim||ultima.odometro_inicio||0;
+  } else {
+    const snapViaturas=await getDocs(collection(db,"viaturas"));
+    snapViaturas.forEach(v=>{
+      if(v.id===id){
+        const d=v.data();
+        input.value=d.odometro||0; // ✅ sempre usa o campo odometro
+      }
+    });
+  }
+};
+
+/* 🆕 Criar missão */
+window.criarMissao=async()=>{
+  const missao=document.getElementById("missao").value.trim();
+  const motorista=document.getElementById("motorista").value || null; // ✅ opcional
+  const viaturaSel=document.getElementById("viatura");
+  const viaturaId=viaturaSel.value;
+  const viaturaNome=viaturaSel.options[viaturaSel.selectedIndex]?.dataset.nome;
+  const foraProg=document.getElementById("foraProg").checked;
+  const odometro=parseInt(document.getElementById("odometro_inicio").value)||0;
+
+  if(!missao||!viaturaId){
+    Swal.fire("Campos obrigatórios","Preencha a missão e selecione a viatura.","error");
+    return;
+  }
+
+  await addDoc(collection(db,"viaturas_missao"),{
+    missao,
+    motorista,
+    viatura:viaturaId,
+    viatura_nome:viaturaNome,
+    odometro_inicio:odometro,
+    status:"Pendente",
+    fora_programacao:foraProg,
+    criada_por:userAtual.email,
+    criada_em:serverTimestamp()
+  });
+
+  Swal.fire("Missão criada!","A missão foi registrada com sucesso.","success");
+  document.querySelector("form").reset();
+  document.getElementById("odometro_inicio").value="";
+};
+
+/* 📋 Listar Missões */
+function carregarMissoes(){
+  const tb=document.getElementById("missoes-body");
+  onSnapshot(collection(db,"viaturas_missao"),snap=>{
+    tb.innerHTML="";
+    snap.forEach(d=>{
+      const m=d.data();
+      if(m.criada_por!==userAtual.email)return; // 🔒 mostra só as criadas pelo auxiliar
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td>${m.missao||""}</td>
+        <td>${m.motorista||"-"}</td>
+        <td>${m.viatura_nome||"-"}</td>
+        <td>${m.status||"Pendente"}</td>
+        <td>${m.odometro_inicio||"-"}</td>
+        <td>${m.odometro_fim||"-"}</td>
+        <td>${m.assinatura_ose||"-"}</td>
+        <td>${m.assinatura_encarregado||"-"}</td>
+        <td>${m.assinatura_chedep||"-"}</td>`;
+      tb.appendChild(tr);
+    });
+  });
+}
+</script>
+</body>
+</html>

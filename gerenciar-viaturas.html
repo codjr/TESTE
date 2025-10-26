@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerenciar Viaturas - Sistema de Viaturas</title>
+<link rel="icon" type="image/svg+xml" 
+      href="https://upload.wikimedia.org/wikipedia/commons/a/ad/Coat_of_arms_of_the_Brazilian_Navy.svg">
+
+<!-- ✅ SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+:root {
+  --cor-primaria: #004aad;
+  --cor-primaria-hover: #003b8e;
+  --cor-fundo: #f5f7fa;
+  --cor-texto: #1f2937;
+  --cor-card: #fff;
+  --cor-borda: #d1d5db;
+  --cor-secundaria: #e2e8f0;
+  --cor-sucesso: #16a34a;
+  --cor-erro: #dc2626;
+  --cor-aviso: #f59e0b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cor-fundo: #0b1120;
+    --cor-card: #111827;
+    --cor-texto: #e5e7eb;
+    --cor-borda: #1f2937;
+    --cor-secundaria: #1e293b;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  min-height: 100vh;
+  padding: 30px 10px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  background: var(--cor-card);
+  border-radius: 10px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, .12);
+  padding: 30px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+header h1 {
+  color: var(--cor-primaria);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+header button {
+  background: var(--cor-erro);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+header button:hover {
+  background: #b91c1c;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+form input {
+  padding: 10px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 6px;
+  font-size: 1rem;
+  flex: 1 1 220px;
+}
+
+button {
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button.cadastrar {
+  background: var(--cor-primaria);
+  color: #fff;
+}
+
+button.cadastrar:hover {
+  background: var(--cor-primaria-hover);
+}
+
+button.editar {
+  background: var(--cor-aviso);
+  color: #fff;
+}
+
+button.editar:hover {
+  background: #b45309;
+}
+
+button.excluir {
+  background: var(--cor-erro);
+  color: #fff;
+}
+
+button.excluir:hover {
+  background: #991b1b;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+thead {
+  background: var(--cor-primaria);
+  color: #fff;
+}
+
+th, td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--cor-borda);
+  text-align: left;
+}
+
+tbody tr:hover {
+  background: rgba(0, 74, 173, .05);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 20px;
+  }
+
+  th, td {
+    font-size: .9rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>🚗 Gerenciamento de Viaturas</h1>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <button onclick="window.location.href='encarregado-dashboard.html'">⬅ Voltar</button>
+      <button onclick="logout()">Sair</button>
+    </div>
+  </header>
+
+  <h2>Cadastrar Nova Viatura</h2>
+  <form onsubmit="event.preventDefault(); cadastrarViatura();">
+    <input type="text" id="identificacao" placeholder="Identificação (Ex: Parati E983-0987)" required>
+    <input type="text" id="modelo" placeholder="Modelo / Tipo" required>
+    <input type="number" id="odometro" placeholder="Odômetro Atual (km)" required>
+    <button type="submit" class="cadastrar">Cadastrar</button>
+  </form>
+
+  <h2>Viaturas Cadastradas</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Identificação</th><th>Modelo</th><th>Odômetro (km)</th>
+        <th>Última Atualização</th><th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="viaturas-body"></tbody>
+  </table>
+</div>
+
+<script type="module">
+import {auth,db} from "./firebase-config.js";
+import {signOut,onAuthStateChanged} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import {
+  collection,addDoc,onSnapshot,updateDoc,deleteDoc,doc,serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+/* 🔒 Proteção e logout automático */
+const LIMITE=10*60*1000;let timer;
+onAuthStateChanged(auth,u=>{
+  if(!u){window.location.href="index.html";}
+  else{resetar();carregarViaturas();
+        ["mousemove","keydown","click","scroll"].forEach(e=>document.addEventListener(e,resetar));}
+});
+function resetar(){clearTimeout(timer);
+  timer=setTimeout(async()=>{
+    Swal.fire({icon:"warning",title:"⏰ Sessão expirada!",text:"Você será desconectado.",timer:3000,showConfirmButton:false});
+    await signOut(auth);
+    setTimeout(()=>window.location.href="index.html",3000);
+  },LIMITE);}
+window.logout=async()=>{
+  Swal.fire({title:"Saindo...",didOpen:()=>Swal.showLoading(),allowOutsideClick:false});
+  await signOut(auth);
+  Swal.close();
+  Swal.fire({icon:"info",title:"Logout efetuado!",timer:1500,showConfirmButton:false});
+  setTimeout(()=>window.location.href="index.html",1500);
+};
+
+/* 🆕 Cadastrar nova viatura */
+window.cadastrarViatura=async()=>{
+  const id=document.getElementById("identificacao").value.trim();
+  const modelo=document.getElementById("modelo").value.trim();
+  const odo=parseInt(document.getElementById("odometro").value.trim());
+  if(!id||!modelo||isNaN(odo)){
+    Swal.fire({icon:"warning",title:"Preencha todos os campos corretamente!"});
+    return;
+  }
+  try{
+    Swal.fire({title:"Cadastrando...",didOpen:()=>Swal.showLoading(),allowOutsideClick:false});
+    await addDoc(collection(db,"viaturas"),{
+      identificacao:id,
+      modelo,
+      odometro_atual:odo,
+      criado_por:auth.currentUser?.email||"encarregado",
+      atualizado_em:serverTimestamp()
+    });
+    Swal.close();
+    Swal.fire({icon:"success",title:"✅ Viatura cadastrada com sucesso!"});
+    document.querySelector("form").reset();
+  }catch(e){
+    Swal.close();
+    Swal.fire({icon:"error",title:"Erro ao cadastrar",text:e.message});
+  }
+};
+
+/* 🔄 Carregar viaturas */
+function carregarViaturas(){
+  const tb=document.getElementById("viaturas-body");
+  onSnapshot(collection(db,"viaturas"),snap=>{
+    tb.innerHTML="";
+    snap.forEach(d=>{
+      const v=d.data();
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td>${v.identificacao}</td>
+        <td>${v.modelo}</td>
+        <td>${v.odometro_atual||0}</td>
+        <td>${v.atualizado_em?.toDate?new Date(v.atualizado_em.toDate()).toLocaleString():"-"}</td>
+        <td>
+          <button class="editar" onclick="editarViatura('${d.id}','${v.identificacao}','${v.odometro_atual||0}')">Editar</button>
+          <button class="excluir" onclick="excluirViatura('${d.id}')">Excluir</button>
+        </td>`;
+      tb.appendChild(tr);
+    });
+  });
+}
+
+/* ✏️ Editar odômetro */
+window.editarViatura=async(id,identAtual,odoAtual)=>{
+  const {value:nv} = await Swal.fire({
+    title:`Editar odômetro de ${identAtual}`,
+    input:"number",
+    inputValue:odoAtual,
+    inputLabel:"Informe o novo valor do odômetro (km)",
+    showCancelButton:true,
+    confirmButtonText:"Salvar",
+    cancelButtonText:"Cancelar",
+    confirmButtonColor:"#004aad",
+    preConfirm:(v)=>{
+      if(!v||isNaN(v)||v<=0){Swal.showValidationMessage("Informe um número válido!");}
+    }
+  });
+  if(!nv) return;
+  try{
+    Swal.fire({title:"Atualizando...",didOpen:()=>Swal.showLoading(),allowOutsideClick:false});
+    await updateDoc(doc(db,"viaturas",id),{
+      odometro_atual:parseInt(nv),
+      atualizado_em:serverTimestamp()
+    });
+    Swal.close();
+    Swal.fire({icon:"success",title:"✏️ Odômetro atualizado com sucesso!"});
+  }catch(e){
+    Swal.close();
+    Swal.fire({icon:"error",title:"Erro ao atualizar",text:e.message});
+  }
+};
+
+/* 🗑️ Excluir */
+window.excluirViatura=async(id)=>{
+  const conf=await Swal.fire({
+    icon:"question",
+    title:"Deseja excluir esta viatura?",
+    text:"Esta ação não poderá ser desfeita.",
+    showCancelButton:true,
+    confirmButtonText:"Sim, excluir",
+    cancelButtonText:"Cancelar",
+    confirmButtonColor:"#dc2626"
+  });
+  if(!conf.isConfirmed)return;
+  try{
+    Swal.fire({title:"Excluindo...",didOpen:()=>Swal.showLoading(),allowOutsideClick:false});
+    await deleteDoc(doc(db,"viaturas",id));
+    Swal.close();
+    Swal.fire({icon:"success",title:"🗑️ Viatura excluída com sucesso!"});
+  }catch(e){
+    Swal.close();
+    Swal.fire({icon:"error",title:"Erro ao excluir",text:e.message});
+  }
+};
+</script>
+</body>
+</html>
