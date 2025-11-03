@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cadastro de Usuário - Sistema de Viaturas</title>
+<link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/netcodebr/vtrteste/refs/heads/main/heraldica-8DN.png" />
+
+<style>
+:root {
+  --azul-marinha:#004aad; --azul-hover:#003b8e;
+  --fundo:#f5f7fa; --texto:#1f2937;
+  --branco:#ffffff; --borda:#d1d5db;
+  --sombra:rgba(0,0,0,0.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+body{
+  background:linear-gradient(135deg,var(--azul-marinha),#0a58ca);
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;padding:20px;
+}
+.card{
+  background:var(--branco);border-radius:12px;
+  box-shadow:0 6px 20px var(--sombra);
+  padding:40px 30px;text-align:center;
+  max-width:400px;width:100%;
+}
+.logo{width:90px;margin-bottom:15px;}
+h2{color:var(--azul-marinha);margin-bottom:25px;}
+input,select{
+  width:100%;padding:12px;margin-bottom:14px;
+  border:1px solid var(--borda);border-radius:8px;
+  background-color:#f9fafb;font-size:15px;transition:0.3s;
+}
+input:focus,select:focus{
+  outline:none;border-color:var(--azul-marinha);
+  box-shadow:0 0 0 3px rgba(0,74,173,0.2);
+}
+select{
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg fill='%23004aad' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 12px center;background-size:16px;
+}
+button{
+  width:100%;padding:12px;border:none;border-radius:8px;
+  font-size:16px;font-weight:600;cursor:pointer;
+  margin-top:5px;transition:background 0.3s;
+}
+button.primary{background-color:var(--azul-marinha);color:var(--branco);}
+button.primary:hover{background-color:var(--azul-hover);}
+button.google{
+  background:#fff;border:1px solid #dadce0;color:#3c4043;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:10px;
+}
+button.google img{width:20px;height:20px;}
+p.hint{margin-top:16px;font-size:14px;}
+p.hint a{color:var(--azul-marinha);text-decoration:none;font-weight:500;}
+p.hint a:hover{text-decoration:underline;}
+</style>
+</head>
+
+<body>
+  <div class="card">
+    <img class="logo" src="https://raw.githubusercontent.com/netcodebr/vtrteste/refs/heads/main/heraldica-8DN.png" alt="Marinha do Brasil" />
+    <h2>Cadastro de Usuário</h2>
+
+    <input type="text" id="nome" placeholder="Nome completo" required />
+    <input type="email" id="email" placeholder="Email institucional" required />
+    <input type="password" id="senha" placeholder="Senha" required />
+
+    <select id="role" required>
+      <option value="">Selecione o cargo</option>
+      <option value="motorista">Motorista</option>
+      <option value="aux_encarregado">Auxiliar do Encarregado</option>
+      <option value="encarregado">Encarregado</option>
+      <option value="ose">Oficial de Serviço</option>
+      <option value="chefe">Chefe de Departamento</option>
+      <option value="adm">Administrador</option>
+    </select>
+
+    <button class="primary" onclick="cadastrar()">Cadastrar</button>
+
+    <div style="margin:12px 0;font-size:14px;color:#555;">ou</div>
+    <button class="google" id="btnGoogle">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+      Cadastrar com Google
+    </button>
+
+    <p class="hint"><a href="index.html">Já tem conta? Faça login</a></p>
+  </div>
+
+<script type="module">
+import { auth, db } from "./firebase-config.js";
+import {
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+// === Cadastro tradicional ===
+window.cadastrar = async () => {
+  const nome = document.getElementById("nome").value.trim();
+  const email = document.getElementById("email").value.trim();
+  const senha = document.getElementById("senha").value;
+  const role = document.getElementById("role").value;
+  if (!nome || !email || !senha || !role) { alert("Preencha todos os campos."); return; }
+
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, senha);
+    await setDoc(doc(db, "usuarios", cred.user.uid), {
+      nome, email, role, aprovado: false, criado_em: serverTimestamp()
+    });
+    alert("Cadastro enviado! Aguarde aprovação do ADM.");
+    window.location.href = "index.html";
+  } catch (e) {
+    alert("Erro no cadastro: " + (e.message || e));
+  }
+};
+
+// === Cadastro com Google ===
+document.getElementById("btnGoogle").addEventListener("click", async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    const ref = doc(db, "usuarios", user.uid);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      await setDoc(ref, {
+        nome: user.displayName || "Usuário Google",
+        email: user.email,
+        role: "motorista",
+        aprovado: false,
+        criado_em: serverTimestamp()
+      });
+      alert("Cadastro com Google criado! Aguarde aprovação do ADM.");
+    } else {
+      alert("Esta conta Google já está cadastrada!");
+    }
+    window.location.href = "index.html";
+  } catch (err) {
+    alert("Erro no cadastro com Google: " + (err.message || err));
+    console.error(err);
+  }
+});
+</script>
+</body>
+</html>
