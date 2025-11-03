@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "vtr-marinha"
+  },
+  "targets": {
+    "vtr-marinha": {
+      "hosting": {
+        "vtr-marinha": [
+          "vtr-marinha"
+        ]
+      }
+    }
+  }
+}
