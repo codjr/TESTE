@@ -3,301 +3,337 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Administrador - Dashboard</title>
-<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/netcodebr/vtrteste/refs/heads/main/heraldica-8DN.png">
+<title>Administrador - Sistema de Viaturas</title>
+
+<!-- Ícone -->
+<link rel="icon" type="image/png"
+      href="https://raw.githubusercontent.com/netcodebr/vtrteste/refs/heads/main/heraldica-8DN.png">
 
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
-<!-- html2canvas + jsPDF para exportar PDF -->
+<!-- html2canvas + jsPDF -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <style>
-/* =======================
-   RESET + BASE
-======================= */
-* { margin:0; padding:0; box-sizing:border-box; font-family:"Inter","Segoe UI",Roboto,sans-serif; }
-body { background:linear-gradient(180deg,#e9ecf4 0%,#f5f7fa 100%); color:#1b1b1b; min-height:100vh; }
+:root {
+  --azul-marinha:#002b5c;
+  --azul-escuro:#001d3d;
+  --dourado:#c9a600;
+  --fundo:#f4f6fa;
+  --texto:#1b1b1b;
+  --borda:#d1d5db;
+  --branco:#ffffff;
+}
 
-/* =======================
-   HEADER
-======================= */
-header { background:#001f3f; color:#fff; display:flex; align-items:center; justify-content:space-between; padding:14px 28px; border-bottom:5px solid #c9a600; box-shadow:0 3px 10px rgba(0,0,0,0.25); }
-.logo-marinha { display:flex; align-items:center; gap:14px; }
-.logo-marinha img { width:50px; height:50px; }
-header h1 { font-size:1.35rem; font-weight:600; letter-spacing:0.5px; }
-header button { background:linear-gradient(145deg,#b30000,#800000); border:none; color:#fff; font-weight:600; padding:8px 18px; border-radius:6px; cursor:pointer; transition:0.25s; }
-header button:hover { transform:scale(1.05); background:linear-gradient(145deg,#cc0000,#990000); }
+/* ===== RESET + BASE ===== */
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Inter","Segoe UI",Roboto,sans-serif;}
+body{background:var(--fundo);color:var(--texto);min-height:100vh;}
 
-/* =======================
-   NAV TABS
-======================= */
-.nav-tabs { display:flex; justify-content:center; flex-wrap:wrap; background:#f0f2f6; box-shadow:inset 0 -1px 0 #ccc; }
-.nav-tabs button { flex:1; min-width:160px; background:none; border:none; padding:14px 18px; font-weight:600; text-transform:uppercase; color:#002b5c; cursor:pointer; transition:all 0.25s ease; letter-spacing:0.4px; }
-.nav-tabs button:hover { background:#dde3f0; color:#001d3d; }
-.nav-tabs button.active { background:#002b5c; color:#fff; box-shadow:inset 0 -4px 0 #c9a600; }
+/* ===== HEADER ===== */
+header{
+  background:var(--azul-marinha);color:#fff;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 26px;border-bottom:5px solid var(--dourado);
+  box-shadow:0 3px 10px rgba(0,0,0,0.25);
+}
+.logo-marinha{display:flex;align-items:center;gap:14px;}
+.logo-marinha img{width:50px;height:50px;}
+header h1{font-size:1.35rem;font-weight:600;}
+header button{
+  background:linear-gradient(145deg,#b30000,#800000);
+  border:none;color:#fff;font-weight:600;
+  padding:8px 18px;border-radius:6px;cursor:pointer;transition:0.25s;
+}
+header button:hover{transform:scale(1.05);background:linear-gradient(145deg,#cc0000,#990000);}
 
-/* =======================
-   CONTAINER E SEÇÕES
-======================= */
-.container { max-width:1300px; margin:30px auto; padding:0 24px; }
-.tab-pane { background:#fff; border-radius:10px; padding:28px; box-shadow:0 4px 15px rgba(0,0,0,0.1); animation:fadeIn 0.3s ease; }
-@keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
-h2 { color:#002b5c; margin-bottom:20px; font-weight:700; border-left:6px solid #c9a600; padding-left:10px; display:flex; align-items:center; gap:10px; }
+/* ===== NAV ===== */
+.nav-tabs{
+  display:flex;flex-wrap:wrap;justify-content:center;
+  background:#f0f2f6;box-shadow:inset 0 -1px 0 #ccc;
+}
+.nav-tabs button{
+  flex:1;min-width:150px;background:none;border:none;
+  padding:12px 16px;font-weight:600;text-transform:uppercase;
+  color:var(--azul-marinha);cursor:pointer;transition:0.25s;
+}
+.nav-tabs button:hover{background:#e4e8f2;color:var(--azul-escuro);}
+.nav-tabs button.active{
+  background:var(--azul-marinha);color:#fff;
+  box-shadow:inset 0 -4px 0 var(--dourado);
+}
 
-/* =======================
-   TABELAS
-======================= */
-.table-wrap { overflow-x:auto; border-radius:8px; }
-table { width:100%; border-collapse:collapse; border-radius:8px; overflow:hidden; }
-thead { background:#002b5c; color:#fff; }
-th, td { padding:12px 16px; border-bottom:1px solid #ddd; text-align:left; font-size:0.95rem; }
-tbody tr:hover { background:#f7f9fc; transition:0.2s; }
+/* ===== CONTEÚDO ===== */
+.container{max-width:1300px;margin:30px auto;padding:0 20px;}
+.tab-pane{
+  background:#fff;border-radius:10px;padding:28px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.1);animation:fadeIn .3s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
 
-/* =======================
-   BOTÕES DE AÇÃO
-======================= */
-.actions button { margin:3px; padding:6px 10px; font-size:0.85rem; border:none; border-radius:6px; cursor:pointer; transition:all 0.2s; font-weight:500; }
-.actions button:hover { transform:scale(1.07); }
-button.aprovar { background:#2e7d32; color:#fff; }
-button.desaprovar { background:#b71c1c; color:#fff; }
-button.editar { background:#1565c0; color:#fff; }
-button.reset { background:#fbc02d; color:#1b1b1b; }
-button.excluir { background:#d32f2f; color:#fff; }
-button.primary { background:#002b5c; color:#fff; }
+/* ===== TÍTULOS ===== */
+h2{
+  color:var(--azul-marinha);margin-bottom:20px;font-weight:700;
+  border-left:6px solid var(--dourado);padding-left:10px;
+  display:flex;align-items:center;gap:10px;
+}
 
-/* =======================
-   BADGES
-======================= */
-.badge-ok { background:#2e7d32; color:#fff; padding:3px 8px; border-radius:5px; font-size:0.8rem; }
-.badge-no { background:#b71c1c; color:#fff; padding:3px 8px; border-radius:5px; font-size:0.8rem; }
-.tag-fp { background:#ff6f00; color:#fff; padding:2px 6px; font-size:0.75rem; border-radius:4px; margin-left:4px; font-weight:600; }
+/* ===== TABELAS ===== */
+.table-wrap{overflow-x:auto;border-radius:8px;}
+table{width:100%;border-collapse:collapse;}
+thead{background:var(--azul-marinha);color:#fff;}
+th,td{padding:12px 14px;border-bottom:1px solid #ddd;text-align:left;font-size:0.95rem;}
+tbody tr:hover{background:#f8f9fc;}
 
-/* =======================
-   GRID/CHARTS
-======================= */
-.grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
-.card { background:#fff; border:1px solid #e8e8e8; border-radius:10px; padding:16px; box-shadow:0 2px 10px rgba(0,0,0,0.06); }
-.card h3 { color:#002b5c; margin-bottom:8px; font-size:1.05rem; }
-.actions-bar { display:flex; gap:10px; margin-bottom:12px; flex-wrap:wrap; }
+/* ===== BOTÕES ===== */
+.actions button{
+  margin:3px;padding:6px 10px;font-size:0.85rem;border:none;border-radius:6px;
+  cursor:pointer;transition:0.25s;font-weight:500;
+}
+.actions button:hover{transform:scale(1.08);}
+.aprovar{background:#2e7d32;color:#fff;}
+.desaprovar{background:#b71c1c;color:#fff;}
+.editar{background:#1565c0;color:#fff;}
+.reset{background:#fbc02d;color:#1b1b1b;}
+.excluir{background:#d32f2f;color:#fff;}
+.primary{background:var(--azul-marinha);color:#fff;}
 
-/* =======================
-   RESPONSIVIDADE
-======================= */
-@media (max-width: 900px) {
-  header { flex-direction:column; gap:8px; text-align:center; }
-  .nav-tabs button { min-width:120px; font-size:0.8rem; }
-  table th, table td { font-size:0.85rem; padding:8px; }
-  .grid { grid-template-columns:1fr; }
+/* ===== BADGES ===== */
+.badge-ok{background:#2e7d32;color:#fff;padding:3px 8px;border-radius:5px;font-size:0.8rem;}
+.badge-no{background:#b71c1c;color:#fff;padding:3px 8px;border-radius:5px;font-size:0.8rem;}
+.tag-fp{background:#ff6f00;color:#fff;padding:2px 6px;border-radius:4px;margin-left:4px;font-weight:600;font-size:0.75rem;}
+
+/* ===== CHARTS ===== */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.card{
+  background:#fff;border:1px solid #e8e8e8;border-radius:10px;
+  padding:16px;box-shadow:0 2px 10px rgba(0,0,0,0.06);
+}
+.card h3{color:var(--azul-marinha);margin-bottom:8px;font-size:1.05rem;}
+.actions-bar{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+
+@media(max-width:900px){
+  header{flex-direction:column;gap:8px;text-align:center;}
+  .nav-tabs button{min-width:120px;font-size:0.8rem;}
+  .grid{grid-template-columns:1fr;}
 }
 </style>
 </head>
 
 <body>
-<div class="container">
-  <header>
-    <div class="logo-marinha">
-      <img src="https://raw.githubusercontent.com/netcodebr/vtrteste/refs/heads/main/heraldica-8DN.png" alt="Marinha do Brasil">
-      <h1>Administrador — Sistema de Viaturas</h1>
-    </div>
-    <button onclick="logout()">Sair</button>
-  </header>
-
-  <div class="nav-tabs">
-    <button class="active" data-tab="tab-adm" onclick="setTab('tab-adm', this)">Usuários ADM</button>
-    <button data-tab="tab-chefe" onclick="setTab('tab-chefe', this)">Usuários Chefes</button>
-    <button data-tab="tab-ose" onclick="setTab('tab-ose', this)">Usuários OSE</button>
-    <button data-tab="tab-encarregado" onclick="setTab('tab-encarregado', this)">Usuários Encarregados</button>
-    <button data-tab="tab-aux" onclick="setTab('tab-aux', this)">Usuários Auxiliares</button>
-    <button data-tab="tab-motorista" onclick="setTab('tab-motorista', this)">Usuários Motoristas</button>
-    <button data-tab="tab-missoes" onclick="setTab('tab-missoes', this)">Missões</button>
-    <button data-tab="tab-estatisticas" onclick="setTab('tab-estatisticas', this)">Estatísticas & Relatórios</button>
-    <button data-tab="tab-permissoes" onclick="setTab('tab-permissoes', this)">Permissões</button>
-    <button data-tab="tab-logs" onclick="setTab('tab-logs', this)">Logs</button>
-    <button data-tab="tab-emulacao" onclick="setTab('tab-emulacao', this)">Emulação</button>
+<header>
+  <div class="logo-marinha">
+    <img src="https://raw.githubusercontent.com/netcodebr/vtrteste/refs/heads/main/heraldica-8DN.png" alt="Marinha do Brasil">
+    <h1>Administrador — Sistema de Viaturas</h1>
   </div>
+  <button onclick="logout()">Sair</button>
+</header>
 
-  <!-- ======== Usuários (6 grupos) ======== -->
-  <section id="tab-adm" class="tab-pane" style="display:block;"><h2>Usuários ADM (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-adm"></tbody></table></div></section>
-  <section id="tab-chefe" class="tab-pane" style="display:none;"><h2>Usuários Chefes (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-chefe"></tbody></table></div></section>
-  <section id="tab-ose" class="tab-pane" style="display:none;"><h2>Usuários OSE (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-ose"></tbody></table></div></section>
-  <section id="tab-encarregado" class="tab-pane" style="display:none;"><h2>Usuários Encarregados (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-encarregado"></tbody></table></div></section>
-  <section id="tab-aux" class="tab-pane" style="display:none;"><h2>Usuários Auxiliares (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-aux"></tbody></table></div></section>
-  <section id="tab-motorista" class="tab-pane" style="display:none;"><h2>Usuários Motoristas (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-motorista"></tbody></table></div></section>
+<div class="nav-tabs">
+  <button class="active" data-tab="tab-adm" onclick="setTab('tab-adm',this)">ADM</button>
+  <button data-tab="tab-chefe" onclick="setTab('tab-chefe',this)">Chefes</button>
+  <button data-tab="tab-ose" onclick="setTab('tab-ose',this)">OSE</button>
+  <button data-tab="tab-encarregado" onclick="setTab('tab-encarregado',this)">Encarregados</button>
+  <button data-tab="tab-aux" onclick="setTab('tab-aux',this)">Auxiliares</button>
+  <button data-tab="tab-motorista" onclick="setTab('tab-motorista',this)">Motoristas</button>
+  <button data-tab="tab-missoes" onclick="setTab('tab-missoes',this)">Missões</button>
+  <button data-tab="tab-estatisticas" onclick="setTab('tab-estatisticas',this)">Estatísticas</button>
+  <button data-tab="tab-permissoes" onclick="setTab('tab-permissoes',this)">Permissões</button>
+  <button data-tab="tab-logs" onclick="setTab('tab-logs',this)">Logs</button>
+  <button data-tab="tab-emulacao" onclick="setTab('tab-emulacao',this)">Emulação</button>
+</div>
 
-  <!-- ======== Missões ======== -->
-  <section id="tab-missoes" class="tab-pane" style="display:none;">
-    <h2 id="titulo-missoes">Missões (0)</h2>
-    <div class="actions-bar">
-      <button class="primary" onclick="exportarRelatorioPDF()">🧾 Exportar Relatório (PDF)</button>
-    </div>
+<div class="container">
+  <!-- USUÁRIOS -->
+  <section id="tab-adm" class="tab-pane" style="display:block;">
+    <h2>Usuários ADM (0)</h2>
     <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>Missão</th><th>Motorista</th><th>Viatura</th><th>Status</th>
-            <th>Odômetro Início</th><th>Horário Início</th>
-            <th>Odômetro Fim</th><th>Horário Fim</th>
-            <th>Assinaturas</th><th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="missoes-body"></tbody>
-      </table>
+      <table><thead><tr><th>Nome</th><th>Email</th><th>Funções</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-adm"></tbody></table>
     </div>
   </section>
+  <section id="tab-chefe" class="tab-pane"><h2>Usuários Chefes (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Funções</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-chefe"></tbody></table></div></section>
+  <section id="tab-ose" class="tab-pane"><h2>Usuários OSE (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Funções</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-ose"></tbody></table></div></section>
+  <section id="tab-encarregado" class="tab-pane"><h2>Usuários Encarregados (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Funções</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-encarregado"></tbody></table></div></section>
+  <section id="tab-aux" class="tab-pane"><h2>Usuários Auxiliares (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Funções</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-aux"></tbody></table></div></section>
+  <section id="tab-motorista" class="tab-pane"><h2>Usuários Motoristas (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Funções</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-motorista"></tbody></table></div></section>
 
-  <!-- ======== Estatísticas & Relatórios ======== -->
+  <!-- MISSÕES -->
+  <section id="tab-missoes" class="tab-pane" style="display:none;">
+    <h2 id="titulo-missoes">Missões (0)</h2>
+    <div class="actions-bar"><button class="primary" onclick="exportarRelatorioPDF()">🧾 Exportar Relatório (PDF)</button></div>
+    <div class="table-wrap"><table><thead><tr><th>Missão</th><th>Motorista</th><th>Viatura</th><th>Status</th><th>Odômetro Início</th><th>Horário Início</th><th>Odômetro Fim</th><th>Horário Fim</th><th>Assinaturas</th><th>Ações</th></tr></thead><tbody id="missoes-body"></tbody></table></div>
+  </section>
+
+  <!-- ESTATÍSTICAS -->
   <section id="tab-estatisticas" class="tab-pane" style="display:none;">
     <h2>Estatísticas & Relatórios</h2>
     <div class="grid" id="charts-container">
-      <div class="card">
-        <h3>📊 Viagens por Motorista</h3>
-        <canvas id="chartMotoristas" height="200"></canvas>
-      </div>
-      <div class="card">
-        <h3>🥧 Missões por Status</h3>
-        <canvas id="chartStatus" height="200"></canvas>
-      </div>
-    </div>
-    <div class="actions-bar" style="margin-top:14px;">
-      <button class="primary" onclick="exportarRelatorioPDF()">🧾 Exportar Relatório (PDF)</button>
+      <div class="card"><h3>📊 Viagens por Motorista</h3><canvas id="chartMotoristas" height="200"></canvas></div>
+      <div class="card"><h3>🥧 Missões por Status</h3><canvas id="chartStatus" height="200"></canvas></div>
     </div>
   </section>
 
-  <!-- ======== Permissões ======== -->
+  <!-- PERMISSÕES -->
   <section id="tab-permissoes" class="tab-pane" style="display:none;">
     <h2>Permissões</h2>
     <div class="card">
-      <p>As permissões determinam quais ações aparecem e podem ser executadas. Você pode sobrescrever no Firestore criando/alterando o doc <code>config/permissoes</code>.</p>
-      <p><b>Exemplo de doc:</b></p>
-      <pre style="background:#f7f7f7; padding:10px; border-radius:8px; overflow:auto;">
-{
-  "usuarios": {"aprovar": true, "desaprovar": true, "editar": true, "resetar": true, "excluir": true},
-  "missoes":  {"editar": true, "alterar_status": true},
-  "relatorios": {"exportar_pdf": true}
-}
-      </pre>
-      <div class="actions-bar">
-        <button class="primary" onclick="mostrarPermissoesAtuais()">👁 Ver permissões ativas</button>
-      </div>
+      <p>As permissões podem ser alteradas via Firestore no documento <code>config/permissoes</code>.</p>
+      <div class="actions-bar"><button class="primary" onclick="mostrarPermissoesAtuais()">👁 Ver Permissões Ativas</button></div>
     </div>
   </section>
 
-  <!-- ======== Logs ======== -->
+  <!-- LOGS -->
   <section id="tab-logs" class="tab-pane" style="display:none;">
     <h2>Logs do Sistema</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Ação</th><th>Alvo</th><th>Feito por</th><th>Data/Hora</th></tr></thead>
-        <tbody id="logs-body"></tbody>
-      </table>
-    </div>
+    <div class="table-wrap"><table><thead><tr><th>Ação</th><th>Alvo</th><th>Usuário</th><th>Data/Hora</th></tr></thead><tbody id="logs-body"></tbody></table></div>
   </section>
 
-  <!-- ======== Emulação ======== -->
+  <!-- EMULAÇÃO -->
   <section id="tab-emulacao" class="tab-pane" style="display:none;">
     <h2>Emulação de Perfil</h2>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Ação</th></tr></thead>
-        <tbody id="emulacao-body"></tbody>
-      </table>
-    </div>
+    <div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Funções</th><th>Ação</th></tr></thead><tbody id="emulacao-body"></tbody></table></div>
   </section>
 </div>
-
+<!-- ===================== PARTE 2 — JS COMPLETO ===================== -->
 <script type="module">
+/* Firebase */
 import { auth, db } from "./firebase-config.js";
-import { signOut, onAuthStateChanged, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-import { collection, onSnapshot, doc, updateDoc, deleteDoc, getDoc, addDoc, serverTimestamp, query, orderBy } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import {
+  signOut,
+  onAuthStateChanged,
+  sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import {
+  collection,
+  onSnapshot,
+  doc,
+  updateDoc,
+  deleteDoc,
+  getDoc,
+  addDoc,
+  serverTimestamp,
+  query,
+  orderBy
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-/* =======================
-   SESSÃO / ABA / LOG
-======================= */
-const LIMITE = 10*60*1000; let t;
-onAuthStateChanged(auth, async (u)=>{
-  if(!u){ return window.location.href="index.html"; }
-  const uDoc = await getDoc(doc(db,"usuarios", u.uid));
-  const data = uDoc.exists() ? uDoc.data() : null;
-  const roles = data ? (Array.isArray(data.roles) ? data.roles.map(r=>String(r).toLowerCase()) : [String(data.role||"").toLowerCase()]) : [];
-  if(!data || (!roles.includes("adm"))){
-    await signOut(auth); window.location.href="index.html"; return;
+/* ===================== Sessão / Segurança / UI Básica ===================== */
+const LIMITE_INATIVIDADE_MS = 10 * 60 * 1000;
+let timerSessao = null;
+
+onAuthStateChanged(auth, async (u) => {
+  if (!u) {
+    window.location.href = "index.html";
+    return;
   }
-  await carregarPermissoes();
-  init();
-  reset();
-  ["mousemove","keydown","click","scroll","touchstart"].forEach(e=>document.addEventListener(e, reset));
+  const uDoc = await getDoc(doc(db, "usuarios", u.uid));
+  if (!uDoc.exists()) {
+    await signOut(auth);
+    window.location.href = "index.html";
+    return;
+  }
+  const perf = uDoc.data();
+  const roles = Array.isArray(perf.roles) ? perf.roles.map(r => String(r).toLowerCase()) : [String(perf.role || "").toLowerCase()];
+  if (!roles.includes("adm")) {
+    await signOut(auth);
+    window.location.href = "index.html";
+    return;
+  }
+
+  // Tudo certo: inicializa
+  initADM();
+  resetInatividade();
+  ["mousemove", "keydown", "click", "scroll", "touchstart"].forEach(ev =>
+    document.addEventListener(ev, resetInatividade)
+  );
 });
-function reset(){ clearTimeout(t); t=setTimeout(async()=>{ await signOut(auth); window.location.href="index.html"; }, LIMITE); }
-window.logout = async()=>{ await signOut(auth); window.location.href="index.html"; };
 
-window.setTab = (id, btn)=>{
-  document.querySelectorAll(".tab-pane").forEach(p=>p.style.display="none");
-  document.getElementById(id).style.display="block";
-  document.querySelectorAll(".nav-tabs button").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-};
-
-async function logAction(acao, alvo, extra={}) {
-  try {
-    await addDoc(collection(db,"logs"), {
-      acao, alvo,
-      feito_por_uid: auth.currentUser?.uid || null,
-      feito_por_email: auth.currentUser?.email || null,
-      data_hora: serverTimestamp(), ...extra
-    });
-  } catch(e){ console.warn("Falha ao gravar log:", e); }
+function resetInatividade() {
+  clearTimeout(timerSessao);
+  timerSessao = setTimeout(async () => {
+    await signOut(auth);
+    window.location.href = "index.html";
+  }, LIMITE_INATIVIDADE_MS);
 }
 
-/* =======================
-   PERMISSÕES (AVANÇADO)
-======================= */
-let PERMISSOES = {
-  usuarios: { aprovar:true, desaprovar:true, editar:true, resetar:true, excluir:true },
-  missoes:  { editar:true, alterar_status:true },
-  relatorios: { exportar_pdf:true }
+window.logout = async () => {
+  await signOut(auth);
+  window.location.href = "index.html";
 };
-async function carregarPermissoes(){
-  try{
-    const cfg = await getDoc(doc(db,"config","permissoes"));
-    if(cfg.exists()){
+
+window.setTab = (id, btn) => {
+  document.querySelectorAll(".tab-pane").forEach(p => p.style.display = "none");
+  const alvo = document.getElementById(id);
+  if (alvo) alvo.style.display = "block";
+  document.querySelectorAll(".nav-tabs button").forEach(b => b.classList.remove("active"));
+  if (btn) btn.classList.add("active");
+};
+
+/* ===================== Permissões (config/permissoes) ===================== */
+let PERMISSOES = {
+  usuarios:  { aprovar: true, desaprovar: true, editar: true, resetar: true, excluir: true },
+  missoes:   { editar: true, alterar_status: true },
+  relatorios:{ exportar_pdf: true }
+};
+
+async function carregarPermissoes() {
+  try {
+    const cfg = await getDoc(doc(db, "config", "permissoes"));
+    if (cfg.exists()) {
       const data = cfg.data();
       PERMISSOES = {
-        usuarios: { ...PERMISSOES.usuarios, ...(data.usuarios||{}) },
-        missoes:  { ...PERMISSOES.missoes,  ...(data.missoes||{}) },
-        relatorios:{ ...PERMISSOES.relatorios, ...(data.relatorios||{}) }
+        usuarios:  { ...PERMISSOES.usuarios, ...(data.usuarios || {}) },
+        missoes:   { ...PERMISSOES.missoes,  ...(data.missoes || {}) },
+        relatorios:{ ...PERMISSOES.relatorios, ...(data.relatorios || {}) }
       };
     }
-  }catch(e){ console.warn("Sem doc config/permissoes. Usando default."); }
+  } catch (e) {
+    console.warn("Permissões padrão em uso (sem config/permissoes).", e);
+  }
 }
-function can(path){
-  const [grupo,acao] = path.split(".");
+
+function can(path) {
+  const [grupo, acao] = path.split(".");
   return !!(PERMISSOES[grupo] && PERMISSOES[grupo][acao]);
 }
-window.mostrarPermissoesAtuais = ()=>{
+
+window.mostrarPermissoesAtuais = () => {
   Swal.fire({
-    title:"Permissões ativas",
-    html:`<pre style="text-align:left;white-space:pre-wrap">${JSON.stringify(PERMISSOES,null,2)}</pre>`,
-    width:600
+    title: "Permissões ativas",
+    html: `<pre style="text-align:left;white-space:pre-wrap">${JSON.stringify(PERMISSOES, null, 2)}</pre>`,
+    width: 640,
   });
 };
 
-/* =======================
-   INICIALIZAÇÃO
-======================= */
-function init(){
-  carregarUsuarios();
-  carregarMissoesRealtime();
-  carregarLogsRealtime();
-  carregarEmulacaoRealtime();
+/* ===================== Log de ações ===================== */
+async function logAction(acao, alvo, extra = {}) {
+  try {
+    await addDoc(collection(db, "logs"), {
+      acao,
+      alvo,
+      feito_por_uid: auth.currentUser?.uid || null,
+      feito_por_email: auth.currentUser?.email || null,
+      data_hora: serverTimestamp(),
+      ...extra
+    });
+  } catch (e) {
+    console.warn("Falha ao gravar log:", e);
+  }
 }
 
-/* =======================
-   USUÁRIOS (SEPARADO POR ROLE + CONTAGEM)
-======================= */
-function carregarUsuarios(){
+/* ===================== Inicialização geral ===================== */
+function initADM() {
+  carregarPermissoes().then(() => {
+    carregarUsuariosMultiRole();
+    carregarMissoesRealtime();
+    carregarLogsRealtime();
+    carregarEmulacaoRealtime();
+  });
+}
+
+/* ===================== Usuários (multi-role) ===================== */
+function carregarUsuariosMultiRole() {
   const grupos = {
     adm:         { tbody: document.getElementById("usuarios-adm"),         titulo: "Usuários ADM" },
     chefe:       { tbody: document.getElementById("usuarios-chefe"),       titulo: "Usuários Chefes" },
@@ -307,394 +343,439 @@ function carregarUsuarios(){
     motorista:   { tbody: document.getElementById("usuarios-motorista"),   titulo: "Usuários Motoristas" }
   };
 
-  onSnapshot(collection(db,"usuarios"),(snap)=>{
+  onSnapshot(collection(db, "usuarios"), (snap) => {
     const count = { adm:0, chefe:0, ose:0, encarregado:0, aux:0, motorista:0 };
-    Object.values(grupos).forEach(g=>g.tbody.innerHTML="");
+    Object.values(grupos).forEach(g => g.tbody.innerHTML = "");
 
-    snap.forEach(d=>{
+    snap.forEach(d => {
       const u = d.data();
+      const roles = Array.isArray(u.roles) ? u.roles : [u.role].filter(Boolean);
+      if (!roles || roles.length === 0) return;
 
-      // ✅ Suporte a 'role' (string) e 'roles' (array)
-      const cargos = Array.isArray(u.roles)
-        ? u.roles.map(r => String(r).toLowerCase())
-        : [String(u.role||"").toLowerCase()];
+      // Distribui o MESMO usuário em todas as tabelas das funções que possui
+      const gruposDoUsuario = new Set();
+      roles.forEach((r) => {
+        const cargo = String(r || "").toLowerCase();
+        let g = null;
+        if (cargo === "adm") g = "adm";
+        else if (cargo === "chefe") g = "chefe";
+        else if (cargo === "ose") g = "ose";
+        else if (cargo === "encarregado") g = "encarregado";
+        else if (cargo === "aux_encarregado" || cargo === "aux") g = "aux";
+        else if (cargo === "motorista") g = "motorista";
+        if (g) gruposDoUsuario.add(g);
+      });
 
-      let grupo = null;
-      if (cargos.includes("adm")) grupo = "adm";
-      else if (cargos.includes("chefe")) grupo = "chefe";
-      else if (cargos.includes("ose")) grupo = "ose";
-      else if (cargos.includes("encarregado")) grupo = "encarregado";
-      else if (cargos.includes("aux_encarregado") || cargos.includes("aux")) grupo = "aux";
-      else if (cargos.includes("motorista")) grupo = "motorista";
-      if(!grupo) return;
+      const cargosTexto = roles.join(", ");
+      const nome = (u.nome || "-").replace(/\"/g, "&quot;");
+      const email = (u.email || "-").replace(/\"/g, "&quot;");
 
-      count[grupo]++;
-      const cargosTexto = Array.isArray(u.roles) ? u.roles.join(", ") : (u.role || "-");
+      const botAprovar    = can("usuarios.aprovar")    ? `<button class="aprovar" onclick="aprovar('${d.id}')">✔ Aprovar</button>`   : "";
+      const botDesaprovar = can("usuarios.desaprovar") ? `<button class="desaprovar" onclick="desaprovar('${d.id}')">✖ Desaprovar</button>` : "";
+      const botEditar     = can("usuarios.editar")     ? `<button class="editar" onclick='editarUsuario("${d.id}", "${nome}", ${JSON.stringify(roles)})'>✏ Editar</button>` : "";
+      const botReset      = can("usuarios.resetar")    ? `<button class="reset" onclick="resetSenha('${email}')">🔁 Resetar Senha</button>` : "";
+      const botExcluir    = can("usuarios.excluir")    ? `<button class="excluir" onclick="excluirUsuario('${d.id}')">🗑 Excluir</button>` : "";
 
-      const aAprovar   = can("usuarios.aprovar")   ? `<button class="aprovar"   onclick="aprovar('${d.id}')">✔ Aprovar</button>` : "";
-      const aDesaprovar= can("usuarios.desaprovar")? `<button class="desaprovar" onclick="desaprovar('${d.id}')">✖ Desaprovar</button>` : "";
-      const aEditar    = can("usuarios.editar")    ? `<button class="editar"    onclick="editarUsuario('${d.id}','${(u.nome||'').replace(/\"/g,'&quot;')}','${cargosTexto.replace(/\"/g,'&quot;')}')">✏ Editar</button>` : "";
-      const aReset     = can("usuarios.resetar")   ? `<button class="reset"     onclick="resetSenha('${u.email||''}')">🔁 Resetar Senha</button>` : "";
-      const aExcluir   = can("usuarios.excluir")   ? `<button class="excluir"   onclick="excluirUsuario('${d.id}')">🗑 Excluir</button>` : "";
-
-      const tr = document.createElement("tr");
-      tr.innerHTML = `
-        <td>${u.nome||"-"}</td>
-        <td>${u.email||"-"}</td>
-        <td>${cargosTexto}</td>
-        <td>${u.aprovado?'<span class="badge-ok">Aprovado</span>':'<span class="badge-no">Pendente</span>'}</td>
-        <td class="actions">
-          ${aAprovar}${aDesaprovar}${aEditar}${aReset}${aExcluir}
-        </td>`;
-      grupos[grupo].tbody.appendChild(tr);
+      gruposDoUsuario.forEach((g) => {
+        count[g]++;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${nome || "-"}</td>
+          <td>${email || "-"}</td>
+          <td>${cargosTexto}</td>
+          <td>${u.aprovado ? '<span class="badge-ok">Aprovado</span>' : '<span class="badge-no">Pendente</span>'}</td>
+          <td class="actions">${botAprovar}${botDesaprovar}${botEditar}${botReset}${botExcluir}</td>`;
+        grupos[g].tbody.appendChild(tr);
+      });
     });
 
     // Atualiza títulos com contagem
-    for(const [k,g] of Object.entries(grupos)){
+    for (const [k, g] of Object.entries(grupos)) {
       const h2 = g.tbody.closest("section").querySelector("h2");
       h2.textContent = `${g.titulo} (${count[k]})`;
     }
   });
 }
 
-/* === AÇÕES DE USUÁRIOS (SweetAlert2) === */
-window.aprovar = async(uid)=>{
-  if(!can("usuarios.aprovar")) return Swal.fire("Sem permissão","Ação não permitida.","error");
-  const conf = await Swal.fire({ title:"Aprovar usuário?", icon:"question", showCancelButton:true, confirmButtonText:"✔ Aprovar" });
-  if(!conf.isConfirmed) return;
-  await updateDoc(doc(db,"usuarios",uid), {aprovado:true});
+/* === Ações de usuários === */
+window.aprovar = async (uid) => {
+  if (!can("usuarios.aprovar")) return Swal.fire("Sem permissão", "Ação não permitida.", "error");
+  const r = await Swal.fire({ title:"Aprovar usuário?", icon:"question", showCancelButton:true, confirmButtonText:"✔ Aprovar" });
+  if (!r.isConfirmed) return;
+  await updateDoc(doc(db, "usuarios", uid), { aprovado: true });
   await logAction("Aprovar usuário", uid);
   Swal.fire("✅ Usuário aprovado!", "", "success");
 };
-window.desaprovar = async(uid)=>{
-  if(!can("usuarios.desaprovar")) return Swal.fire("Sem permissão","Ação não permitida.","error");
-  const conf = await Swal.fire({ title:"Desaprovar usuário?", icon:"warning", showCancelButton:true, confirmButtonText:"✖ Desaprovar" });
-  if(!conf.isConfirmed) return;
-  await updateDoc(doc(db,"usuarios",uid), {aprovado:false});
+
+window.desaprovar = async (uid) => {
+  if (!can("usuarios.desaprovar")) return Swal.fire("Sem permissão", "Ação não permitida.", "error");
+  const r = await Swal.fire({ title:"Desaprovar usuário?", icon:"warning", showCancelButton:true, confirmButtonText:"✖ Desaprovar" });
+  if (!r.isConfirmed) return;
+  await updateDoc(doc(db, "usuarios", uid), { aprovado: false });
   await logAction("Desaprovar usuário", uid);
-  Swal.fire("Usuário desaprovado!","","info");
+  Swal.fire("Usuário desaprovado.", "", "info");
 };
 
-/* ===== EDITAR USUÁRIO (múltiplas funções; bloqueia ADM) ===== */
-window.editarUsuario = async(uid,nomeAtual,cargosAtuaisTexto="")=>{
-  if(!can("usuarios.editar")) return Swal.fire("Sem permissão","Ação não permitida.","error");
+window.resetSenha = async (email) => {
+  if (!can("usuarios.resetar")) return Swal.fire("Sem permissão", "Ação não permitida.", "error");
+  if (!email || email === "-") return Swal.fire("Erro", "Usuário sem e-mail válido.", "error");
+  const r = await Swal.fire({ title:"Redefinir senha?", text:`Enviar e-mail para ${email}?`, icon:"question", showCancelButton:true, confirmButtonText:"🔁 Enviar" });
+  if (!r.isConfirmed) return;
+  try {
+    await sendPasswordResetEmail(auth, email);
+    await logAction("Resetar senha", email);
+    Swal.fire("📧 Email de redefinição enviado!", "", "success");
+  } catch (e) {
+    Swal.fire("Erro", "Falha ao enviar e-mail.", "error");
+  }
+};
 
-  // Normaliza roles atuais
-  const rolesAtuais = cargosAtuaisTexto
-    ? cargosAtuaisTexto.split(",").map(r => r.trim().toLowerCase()).filter(Boolean)
-    : [];
+window.excluirUsuario = async (uid) => {
+  if (!can("usuarios.excluir")) return Swal.fire("Sem permissão", "Ação não permitida.", "error");
+  const r = await Swal.fire({
+    title:"Excluir usuário?",
+    text:"Ação irreversível.",
+    icon:"warning",
+    showCancelButton:true,
+    confirmButtonText:"🗑 Excluir",
+    confirmButtonColor:"#d32f2f"
+  });
+  if (!r.isConfirmed) return;
+  await deleteDoc(doc(db, "usuarios", uid));
+  await logAction("Excluir usuário", uid);
+  Swal.fire("Usuário excluído.", "", "success");
+};
 
-  // Se o usuário-alvo já é ADM, bloquear edição de roles (apenas nome)
-  const isAlvoADM = rolesAtuais.includes("adm");
+/* === Editar usuário (nome + múltiplas funções) — bloqueia ADM === */
+window.editarUsuario = async (uid, nomeAtual, rolesAtuais = []) => {
+  if (!can("usuarios.editar")) return Swal.fire("Sem permissão", "Ação não permitida.", "error");
 
-  const roleGridHTML = isAlvoADM
-    ? `<div style="margin-top:8px; padding:10px; border-radius:8px; background:#fff3cd; color:#7a5b00; border:1px solid #ffe08a;">
+  const temADM = rolesAtuais.map(r => String(r).toLowerCase()).includes("adm");
+
+  const gridFuncoes = temADM
+    ? `<div style="margin-top:8px;padding:10px;border-radius:8px;background:#fff3cd;color:#7a5b00;border:1px solid #ffe08a;">
          ⚠ Este usuário possui o papel <b>ADM</b>. As funções não podem ser alteradas aqui.
        </div>`
     : `
-      <div class="funcoes-grid" style="margin-top:10px">
-        <div class="funcoes-item"><input type="checkbox" class="role" value="motorista" id="rMotorista"><label for="rMotorista">🚗 Motorista</label></div>
-        <div class="funcoes-item"><input type="checkbox" class="role" value="aux_encarregado" id="rAux"><label for="rAux">🧾 Auxiliar do Encarregado</label></div>
-        <div class="funcoes-item"><input type="checkbox" class="role" value="encarregado" id="rEnc"><label for="rEnc">🧭 Encarregado</label></div>
-        <div class="funcoes-item"><input type="checkbox" class="role" value="ose" id="rOSE"><label for="rOSE">📜 OSE</label></div>
-        <div class="funcoes-item"><input type="checkbox" class="role" value="chefe" id="rChefe"><label for="rChefe">⚓ Chefe de Departamento</label></div>
+      <div class="funcoes-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px 24px;text-align:left;margin-top:10px;">
+        <label class="funcoes-item" style="display:flex;align-items:center;gap:10px;border:2px solid #cbd5e1;border-radius:10px;padding:10px 14px;">
+          <input type="checkbox" class="role" value="motorista" /> 🚗 Motorista
+        </label>
+        <label class="funcoes-item" style="display:flex;align-items:center;gap:10px;border:2px solid #cbd5e1;border-radius:10px;padding:10px 14px;">
+          <input type="checkbox" class="role" value="aux_encarregado" /> 🧾 Auxiliar do Encarregado
+        </label>
+        <label class="funcoes-item" style="display:flex;align-items:center;gap:10px;border:2px solid #cbd5e1;border-radius:10px;padding:10px 14px;">
+          <input type="checkbox" class="role" value="encarregado" /> 🧭 Encarregado
+        </label>
+        <label class="funcoes-item" style="display:flex;align-items:center;gap:10px;border:2px solid #cbd5e1;border-radius:10px;padding:10px 14px;">
+          <input type="checkbox" class="role" value="ose" /> 📜 OSE
+        </label>
+        <label class="funcoes-item" style="display:flex;align-items:center;gap:10px;border:2px solid #cbd5e1;border-radius:10px;padding:10px 14px;">
+          <input type="checkbox" class="role" value="chefe" /> ⚓ Chefe de Departamento
+        </label>
       </div>
     `;
 
-  const { value: formValues } = await Swal.fire({
-    title:'<span style="color:#004aad;font-weight:700;">Editar Usuário</span>',
+  const { value: form } = await Swal.fire({
+    title: '<span style="color:#004aad;font-weight:700;">Editar Usuário</span>',
     html: `
-      <style>
-        .swal2-popup.custom-modal { border-radius: 14px !important; background: linear-gradient(180deg, #f9fafc, #eef3f9); box-shadow: 0 0 25px rgba(0,0,0,0.2); }
-        .funcoes-item { background: white; border: 2px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; transition: 0.25s; }
-        .funcoes-item:hover { border-color: #004aad; background: #f0f7ff; transform: translateY(-1px); }
-        .funcoes-item input { width: 18px; height: 18px; accent-color: #004aad; cursor: pointer; }
-        .funcoes-item label { font-size: 15px; color: #1e293b; cursor: pointer; }
-        .swal2-confirm.custom-confirm { background-color: #004aad !important; color: #fff !important; font-weight: 600 !important; border-radius: 8px !important; padding: 10px 0 !important; }
-        .swal2-cancel.custom-cancel { background-color: #64748b !important; color: #fff !important; font-weight: 600 !important; border-radius: 8px !important; padding: 10px 0 !important; }
-        .funcoes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 25px; text-align: left; }
-      </style>
-
-      <input id="swal-nome" class="swal2-input" placeholder="Nome completo" value="${(nomeAtual||"").replace(/"/g,'&quot;')}" />
-      ${roleGridHTML}
+      <input id="swal-nome" class="swal2-input" placeholder="Nome completo" value="${(nomeAtual||"").replace(/"/g,"&quot;")}" />
+      ${gridFuncoes}
     `,
-    width: 620,
-    background: "#ffffff",
-    customClass: { popup: "custom-modal", confirmButton: "custom-confirm", cancelButton: "custom-cancel" },
     showCancelButton: true,
     confirmButtonText: "💾 Salvar",
-    cancelButtonText: "Cancelar",
     focusConfirm: false,
+    width: 640,
     didOpen: () => {
-      if (!isAlvoADM) {
-        // Marca os roles atuais (exceto 'adm' que nem aparece)
-        document.querySelectorAll(".role").forEach((cb) => {
+      if (!temADM) {
+        // Pre-marcar checkboxes conforme roles atuais
+        document.querySelectorAll(".role").forEach(cb => {
           if (rolesAtuais.includes(cb.value)) cb.checked = true;
         });
       }
     },
     preConfirm: () => {
       const nome = document.getElementById("swal-nome").value.trim();
-      if (!nome) { Swal.showValidationMessage("Preencha o nome corretamente."); return false; }
+      if (!nome) { Swal.showValidationMessage("Informe o nome."); return false; }
 
-      if (isAlvoADM) {
-        // Não alteramos roles de um usuário que já é ADM (somente nome)
-        return { nome, roles: rolesAtuais };
-      }
+      if (temADM) return { nome, roles: rolesAtuais }; // bloqueia mudar roles de quem já é ADM
 
       const selecionadas = Array.from(document.querySelectorAll(".role:checked")).map(i => i.value);
       if (selecionadas.length === 0) { Swal.showValidationMessage("Selecione pelo menos uma função."); return false; }
       if (selecionadas.includes("adm")) { Swal.showValidationMessage("Função ADM é restrita."); return false; }
 
       return { nome, roles: selecionadas };
-    },
+    }
   });
 
-  if (!formValues) return;
+  if (!form) return;
 
-  // Atualiza o documento no Firestore (mantém compatibilidade com dashboards antigos usando 'role')
-  await updateDoc(doc(db,"usuarios",uid), {
-    nome: formValues.nome,
-    roles: formValues.roles,
-    role: formValues.roles[0] || null
+  await updateDoc(doc(db, "usuarios", uid), {
+    nome: form.nome,
+    roles: form.roles,
+    role: form.roles[0] || null // compatibilidade com dashboards antigos
   });
 
-  await logAction("Editar usuário", uid, { nome: formValues.nome, roles: formValues.roles });
+  await logAction("Editar usuário", uid, { nome: form.nome, roles: form.roles });
   Swal.fire("✅ Usuário atualizado!", "", "success");
 };
 
-window.resetSenha = async(email)=>{
-  if(!can("usuarios.resetar")) return Swal.fire("Sem permissão","Ação não permitida.","error");
-  if(!email) return Swal.fire("Erro","Usuário sem e-mail cadastrado.","error");
-  const conf = await Swal.fire({ title:"Redefinir senha?", text:`Enviar e-mail para ${email}?`, icon:"question", showCancelButton:true, confirmButtonText:"🔁 Enviar" });
-  if(!conf.isConfirmed) return;
-  try{ await sendPasswordResetEmail(auth,email); await logAction("Reset senha", email); Swal.fire("📧 Email enviado!","","success"); }
-  catch(e){ Swal.fire("Erro","Falha ao enviar.","error"); }
-};
-window.excluirUsuario = async(uid)=>{
-  if(!can("usuarios.excluir")) return Swal.fire("Sem permissão","Ação não permitida.","error");
-  const conf = await Swal.fire({ title:"Excluir usuário?", text:"Ação irreversível.", icon:"warning", showCancelButton:true, confirmButtonText:"🗑 Excluir", confirmButtonColor:"#d32f2f" });
-  if(!conf.isConfirmed) return;
-  await deleteDoc(doc(db,"usuarios",uid));
-  await logAction("Excluir usuário", uid);
-  Swal.fire("🗑 Usuário excluído!","","success");
-};
-
-/* =======================
-   MISSÕES + CONTAGEM
-======================= */
+/* ===================== Missões + Estatísticas ===================== */
 let MISSOES_CACHE = [];
-function carregarMissoesRealtime(){
-  onSnapshot(collection(db,"viaturas_missao"),(snap)=>{
-    MISSOES_CACHE=[]; snap.forEach(d=>MISSOES_CACHE.push({id:d.id,...d.data()}));
+function carregarMissoesRealtime() {
+  onSnapshot(collection(db, "viaturas_missao"), (snap) => {
+    MISSOES_CACHE = [];
+    snap.forEach(d => MISSOES_CACHE.push({ id: d.id, ...d.data() }));
     renderMissoes(MISSOES_CACHE);
     updateCharts(MISSOES_CACHE);
   });
 }
-function renderMissoes(list){
-  const tbody=document.getElementById("missoes-body");
-  if(!tbody) return;
-  tbody.innerHTML="";
-  list.forEach(m=>{
+
+function renderMissoes(list) {
+  const tbody = document.getElementById("missoes-body");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+
+  list.forEach(m => {
     const aEditar = can("missoes.editar") ? `<button class="editar" onclick="editarMissao('${m.id}')">✏ Editar</button>` : "";
     const aStatus = can("missoes.alterar_status") ? `<button class="reset" onclick="alterarStatus('${m.id}')">↺ Status</button>` : "";
-    const tr=document.createElement("tr");
-    tr.innerHTML=`
-      <td>${m.missao||"-"} ${m.fora_programacao?'<span class="tag-fp">⚠ Fora</span>':""}</td>
-      <td>${m.motorista||"-"}</td>
-      <td>${m.viatura_label||m.viatura||"-"}</td>
-      <td>${m.status||"Pendente"}</td>
-      <td>${m.odometro_inicio||"-"}</td>
-      <td>${m.horario_inicio||"-"}</td>
-      <td>${m.odometro_fim||"-"}</td>
-      <td>${m.horario_fim||"-"}</td>
-      <td>${(m.assinatura_ose||"-")}<br>${(m.assinatura_encarregado||"-")}<br>${(m.assinatura_chedep||"-")}</td>
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${m.missao || "-"} ${m.fora_programacao ? '<span class="tag-fp">⚠ Fora</span>' : ""}</td>
+      <td>${m.motorista || "-"}</td>
+      <td>${m.viatura_label || m.viatura || "-"}</td>
+      <td>${m.status || "Pendente"}</td>
+      <td>${m.odometro_inicio || "-"}</td>
+      <td>${m.horario_inicio || "-"}</td>
+      <td>${m.odometro_fim || "-"}</td>
+      <td>${m.horario_fim || "-"}</td>
+      <td>${(m.assinatura_ose || "-")}<br>${(m.assinatura_encarregado || "-")}<br>${(m.assinatura_chedep || "-")}</td>
       <td class="actions">${aEditar}${aStatus}</td>`;
     tbody.appendChild(tr);
   });
+
   const t = document.getElementById("titulo-missoes");
-  if(t) t.textContent = `Missões (${list.length})`;
+  if (t) t.textContent = `Missões (${list.length})`;
 }
-window.editarMissao = async(id)=>{
-  if(!can("missoes.editar")) return Swal.fire("Sem permissão","Ação não permitida.","error");
-  const ref=doc(db,"viaturas_missao",id); const d=await getDoc(ref);
-  if(!d.exists()) return Swal.fire("Erro","Missão não encontrada.","error");
-  const m=d.data();
-  const { value:v } = await Swal.fire({
-    title:"Editar Missão",
-    html:`<input id="swal-missao" class="swal2-input" placeholder="Missão" value="${m.missao||""}">
-          <input id="swal-motorista" class="swal2-input" placeholder="Motorista" value="${m.motorista||""}">
-          <input id="swal-viatura" class="swal2-input" placeholder="Viatura" value="${m.viatura_label||m.viatura||""}">`,
-    showCancelButton:true, confirmButtonText:"Salvar",
-    preConfirm:()=>{
-      const missao=document.getElementById("swal-missao").value.trim();
-      const motorista=document.getElementById("swal-motorista").value.trim();
-      const viatura=document.getElementById("swal-viatura").value.trim();
-      if(!missao||!motorista||!viatura){Swal.showValidationMessage("Preencha todos os campos"); return false;}
-      return {missao,motorista,viatura};
+
+window.editarMissao = async (id) => {
+  if (!can("missoes.editar")) return Swal.fire("Sem permissão", "Ação não permitida.", "error");
+  const ref = doc(db, "viaturas_missao", id);
+  const d = await getDoc(ref);
+  if (!d.exists()) return Swal.fire("Erro", "Missão não encontrada.", "error");
+  const m = d.data();
+
+  const { value: v } = await Swal.fire({
+    title: "Editar Missão",
+    html: `
+      <input id="swal-missao" class="swal2-input" placeholder="Missão" value="${m.missao || ""}">
+      <input id="swal-motorista" class="swal2-input" placeholder="Motorista" value="${m.motorista || ""}">
+      <input id="swal-viatura" class="swal2-input" placeholder="Viatura" value="${m.viatura_label || m.viatura || ""}">
+    `,
+    showCancelButton: true,
+    confirmButtonText: "Salvar",
+    preConfirm: () => {
+      const missao = document.getElementById("swal-missao").value.trim();
+      const motorista = document.getElementById("swal-motorista").value.trim();
+      const viatura = document.getElementById("swal-viatura").value.trim();
+      if (!missao || !motorista || !viatura) { Swal.showValidationMessage("Preencha todos os campos."); return false; }
+      return { missao, motorista, viatura };
     }
   });
-  if(!v) return;
-  await updateDoc(ref,{missao:v.missao,motorista:v.motorista,viatura_label:v.viatura});
+  if (!v) return;
+
+  await updateDoc(ref, { missao: v.missao, motorista: v.motorista, viatura_label: v.viatura });
   await logAction("Editar missão", id);
-  Swal.fire("Missão atualizada!","","success");
-};
-window.alterarStatus = async(id)=>{
-  if(!can("missoes.alterar_status")) return Swal.fire("Sem permissão","Ação não permitida.","error");
-  const { value:status } = await Swal.fire({title:"Alterar status",input:"text",inputPlaceholder:"Ex: Concluída, Em viagem...",showCancelButton:true,confirmButtonText:"Salvar"});
-  if(!status) return;
-  await updateDoc(doc(db,"viaturas_missao",id),{status});
-  await logAction("Alterar status missão", id, {status});
-  Swal.fire("Status atualizado!","","success");
+  Swal.fire("Missão atualizada!", "", "success");
 };
 
-/* =======================
-   CHARTS (Chart.js)
-======================= */
-let chartMotoristas=null, chartStatus=null;
+window.alterarStatus = async (id) => {
+  if (!can("missoes.alterar_status")) return Swal.fire("Sem permissão", "Ação não permitida.", "error");
+  const { value: status } = await Swal.fire({ title: "Alterar status", input: "text", inputPlaceholder: "Ex: Concluída, Em viagem...", showCancelButton: true, confirmButtonText: "Salvar" });
+  if (!status) return;
+  await updateDoc(doc(db, "viaturas_missao", id), { status });
+  await logAction("Alterar status missão", id, { status });
+  Swal.fire("Status atualizado!", "", "success");
+};
 
-function aggregateByMotorista(missoes){
-  const map=new Map();
-  missoes.forEach(m=>{
-    const k=(m.motorista||"Sem motorista").trim()||"Sem motorista";
-    map.set(k,(map.get(k)||0)+1);
+/* ===== Charts (Chart.js) ===== */
+let chartMotoristas = null, chartStatus = null;
+
+function aggregateByMotorista(missoes) {
+  const map = new Map();
+  missoes.forEach(m => {
+    const k = (m.motorista || "Sem motorista").trim() || "Sem motorista";
+    map.set(k, (map.get(k) || 0) + 1);
   });
-  const arr=[...map.entries()].sort((a,b)=>b[1]-a[1]);
-  const top=arr.slice(0,10);
-  const outrosCount=arr.slice(10).reduce((s,[_k,v])=>s+v,0);
-  if(outrosCount>0) top.push(["Outros", outrosCount]);
-  return { labels: top.map(x=>x[0]), data: top.map(x=>x[1]) };
-}
-function aggregateByStatus(missoes){
-  const map=new Map();
-  missoes.forEach(m=>{
-    const k=(m.status||"Pendente").trim()||"Pendente";
-    map.set(k,(map.get(k)||0)+1);
-  });
-  const arr=[...map.entries()].sort((a,b)=>b[1]-a[1]);
-  return { labels: arr.map(x=>x[0]), data: arr.map(x=>x[1]) };
-}
-function updateCharts(missoes){
-  // Motoristas
-  const mAgg=aggregateByMotorista(missoes);
-  const ctxM=document.getElementById("chartMotoristas");
-  if(ctxM){
-    if(chartMotoristas) chartMotoristas.destroy();
-    chartMotoristas=new Chart(ctxM, {
-      type:"bar",
-      data:{ labels:mAgg.labels, datasets:[{ label:"Viagens", data:mAgg.data, backgroundColor:"#1565c0" }]},
-      options:{ responsive:true, plugins:{ legend:{ display:false }}, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 }}} }
-    });
-  }
-  // Status
-  const sAgg=aggregateByStatus(missoes);
-  const ctxS=document.getElementById("chartStatus");
-  if(ctxS){
-    if(chartStatus) chartStatus.destroy();
-    const colors=["#2e7d32","#1565c0","#ff6f00","#b71c1c","#6a1b9a","#00897b","#8d6e63","#455a64","#ffa000","#90a4ae"];
-    chartStatus=new Chart(ctxS, {
-      type:"doughnut",
-      data:{ labels:sAgg.labels, datasets:[{ data:sAgg.data, backgroundColor: sAgg.labels.map((_,i)=>colors[i%colors.length]) }]},
-      options:{ responsive:true, plugins:{ legend:{ position:"bottom" } } }
-    });
-  }
+  const arr = [...map.entries()].sort((a, b) => b[1] - a[1]);
+  const top = arr.slice(0, 10);
+  const outros = arr.slice(10).reduce((s, [,v]) => s + v, 0);
+  if (outros > 0) top.push(["Outros", outros]);
+  return { labels: top.map(x => x[0]), data: top.map(x => x[1]) };
 }
 
-/* =======================
-   RELATÓRIOS (PDF)
-======================= */
-window.exportarRelatorioPDF = async()=>{
-  if(!can("relatorios.exportar_pdf")) return Swal.fire("Sem permissão","Ação não permitida.","error");
+function aggregateByStatus(missoes) {
+  const map = new Map();
+  missoes.forEach(m => {
+    const k = (m.status || "Pendente").trim() || "Pendente";
+    map.set(k, (map.get(k) || 0) + 1);
+  });
+  const arr = [...map.entries()].sort((a, b) => b[1] - a[1]);
+  return { labels: arr.map(x => x[0]), data: arr.map(x => x[1]) };
+}
+
+function updateCharts(missoes) {
+  // Motoristas (Bar)
+  const mAgg = aggregateByMotorista(missoes);
+  const ctxM = document.getElementById("chartMotoristas");
+  if (ctxM) {
+    if (chartMotoristas) chartMotoristas.destroy();
+    chartMotoristas = new Chart(ctxM, {
+      type: "bar",
+      data: { labels: mAgg.labels, datasets: [{ label: "Viagens", data: mAgg.data, backgroundColor: "#1565c0" }] },
+      options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
+  }
+
+  // Status (Doughnut)
+  const sAgg = aggregateByStatus(missoes);
+  const ctxS = document.getElementById("chartStatus");
+  if (ctxS) {
+    if (chartStatus) chartStatus.destroy();
+    const colors = ["#2e7d32","#1565c0","#ff6f00","#b71c1c","#6a1b9a","#00897b","#8d6e63","#455a64","#ffa000","#90a4ae"];
+    chartStatus = new Chart(ctxS, {
+      type: "doughnut",
+      data: { labels: sAgg.labels, datasets: [{ data: sAgg.data, backgroundColor: sAgg.labels.map((_,i) => colors[i % colors.length]) }] },
+      options: { responsive: true, plugins: { legend: { position: "bottom" } } }
+    });
+  }
+}
+
+/* ===================== Relatórios (PDF) ===================== */
+window.exportarRelatorioPDF = async () => {
+  if (!can("relatorios.exportar_pdf")) return Swal.fire("Sem permissão", "Ação não permitida.", "error");
   const { jsPDF } = window.jspdf;
-  const docPdf = new jsPDF({ unit:"pt", format:"a4" });
-  const margin=40; let y=margin;
+  const docPdf = new jsPDF({ unit: "pt", format: "a4" });
+  const margin = 40; let y = margin;
 
-  const titulo="Relatório de Missões";
+  // Cabeçalho
   docPdf.setFont("helvetica","bold"); docPdf.setFontSize(16);
-  docPdf.text(titulo, margin, y); y+=18;
+  docPdf.text("Relatório de Missões", margin, y); y += 18;
   docPdf.setFont("helvetica","normal"); docPdf.setFontSize(10);
-  docPdf.text(`Gerado em: ${new Date().toLocaleString()}`, margin, y); y+=14;
+  docPdf.text(`Gerado em: ${new Date().toLocaleString()}`, margin, y); y += 14;
 
   // Sumário
-  const total= MISSOES_CACHE.length;
-  const porStatus=aggregateByStatus(MISSOES_CACHE);
-  docPdf.setFont("helvetica","bold"); docPdf.text("Sumário:", margin, y); y+=14;
+  const total = MISSOES_CACHE.length;
+  const porStatus = aggregateByStatus(MISSOES_CACHE);
+  docPdf.setFont("helvetica","bold"); docPdf.text("Sumário:", margin, y); y += 14;
   docPdf.setFont("helvetica","normal");
-  docPdf.text(`Total de missões: ${total}`, margin, y); y+=14;
-  porStatus.labels.forEach((st, i)=>{ docPdf.text(`- ${st}: ${porStatus.data[i]}`, margin, y); y+=12; });
+  docPdf.text(`Total de missões: ${total}`, margin, y); y += 14;
+  porStatus.labels.forEach((st, i) => { docPdf.text(`- ${st}: ${porStatus.data[i]}`, margin, y); y += 12; });
 
-  // Capturar charts
-  const chartsDiv=document.getElementById("charts-container");
-  if(chartsDiv){
-    const canvasImg = await html2canvas(chartsDiv, { scale:1.5, backgroundColor:"#ffffff" });
+  // Gráficos
+  const chartsDiv = document.getElementById("charts-container");
+  if (chartsDiv) {
+    const canvasImg = await html2canvas(chartsDiv, { scale: 1.5, backgroundColor: "#ffffff" });
     const imgData = canvasImg.toDataURL("image/png");
-    const pageWidth=docPdf.internal.pageSize.getWidth()-margin*2;
-    const imgW=pageWidth, imgH= (canvasImg.height/canvasImg.width)*imgW;
-    y+=10;
-    if(y+imgH>docPdf.internal.pageSize.getHeight()-margin){ docPdf.addPage(); y=margin; }
-    docPdf.addImage(imgData,"PNG", margin, y, imgW, imgH);
-    y+=imgH+10;
+    const pageWidth = docPdf.internal.pageSize.getWidth() - margin * 2;
+    const imgW = pageWidth, imgH = (canvasImg.height / canvasImg.width) * imgW;
+    y += 10;
+    if (y + imgH > docPdf.internal.pageSize.getHeight() - margin) { docPdf.addPage(); y = margin; }
+    docPdf.addImage(imgData, "PNG", margin, y, imgW, imgH);
+    y += imgH + 10;
   }
 
-  // Final
   docPdf.save(`relatorio_missoes_${new Date().toISOString().slice(0,10)}.pdf`);
-  await logAction("Exportar relatório PDF","missoes");
-  Swal.fire("✅ Relatório exportado!","","success");
+  await logAction("Exportar relatório PDF", "missoes");
+  Swal.fire("✅ Relatório exportado!", "", "success");
 };
 
-/* =======================
-   LOGS
-======================= */
-function carregarLogsRealtime(){
-  onSnapshot(query(collection(db,"logs"),orderBy("data_hora","desc")),(snap)=>{
-    const tbody=document.getElementById("logs-body");
-    if(!tbody) return;
-    tbody.innerHTML="";
-    snap.forEach(d=>{
-      const l=d.data();
-      const row={acao:l.acao||"",alvo:l.alvo||"",feito:l.feito_por_email||"",data:l.data_hora?.toDate?l.data_hora.toDate().toLocaleString():""};
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${row.acao}</td><td>${row.alvo}</td><td>${row.feito}</td><td>${row.data}</td>`;
+/* ===================== Logs (tempo real) ===================== */
+function carregarLogsRealtime() {
+  onSnapshot(query(collection(db, "logs"), orderBy("data_hora", "desc")), (snap) => {
+    const tbody = document.getElementById("logs-body");
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    snap.forEach(d => {
+      const l = d.data();
+      const dataStr = l.data_hora?.toDate ? l.data_hora.toDate().toLocaleString() : "";
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${l.acao || ""}</td><td>${l.alvo || ""}</td><td>${l.feito_por_email || ""}</td><td>${dataStr}</td>`;
       tbody.appendChild(tr);
     });
   });
 }
 
-/* =======================
-   EMULAÇÃO
-======================= */
-function carregarEmulacaoRealtime(){
-  const tbody=document.getElementById("emulacao-body");
-  onSnapshot(collection(db,"usuarios"),(snap)=>{
-    if(!tbody) return;
-    tbody.innerHTML="";
-    snap.forEach(d=>{
-      const u=d.data();
-      const cargosTexto = Array.isArray(u.roles) ? u.roles.join(", ") : (u.role || "-");
-      const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${u.nome||"-"}</td><td>${u.email||"-"}</td><td>${cargosTexto}</td><td><button class="editar" onclick="emularPerfil('${u.email||''}','${cargosTexto.replace(/\"/g,'&quot;')}')">Emular</button></td>`;
+/* ===================== Emulação (multi-role) ===================== */
+function carregarEmulacaoRealtime() {
+  const tbody = document.getElementById("emulacao-body");
+  onSnapshot(collection(db, "usuarios"), (snap) => {
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    snap.forEach(d => {
+      const u = d.data();
+      const roles = Array.isArray(u.roles) ? u.roles : [u.role].filter(Boolean);
+      const cargosTexto = roles.length ? roles.join(", ") : "-";
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${u.nome || "-"}</td>
+        <td>${u.email || "-"}</td>
+        <td>${cargosTexto}</td>
+        <td>
+          <button class="editar" onclick='emularPerfil(${JSON.stringify(u.email||"")}, ${JSON.stringify(roles)})'>
+            Emular
+          </button>
+        </td>`;
       tbody.appendChild(tr);
     });
   });
 }
-window.emularPerfil=(email,cargosTexto)=>{
-  if(!email) return Swal.fire("Erro","Usuário inválido.","error");
-  const roles = cargosTexto.split(",").map(r=>r.trim().toLowerCase());
+
+window.emularPerfil = async (email, rolesEntrada) => {
+  if (!email) return Swal.fire("Erro", "Usuário inválido.", "error");
   const rotas = {
-    adm:"adm-dashboard.html",
-    chefe:"chefe-dashboard.html",
-    ose:"ose-dashboard.html",
-    encarregado:"encarregado-dashboard.html",
-    motorista:"motorista-dashboard.html",
-    "aux_encarregado":"aux-encarregado-dashboard.html",
-    aux:"aux-encarregado-dashboard.html"
+    adm: "adm-dashboard.html",
+    chefe: "chefe-dashboard.html",
+    ose: "ose-dashboard.html",
+    encarregado: "encarregado-dashboard.html",
+    aux_encarregado: "aux-encarregado-dashboard.html",
+    motorista: "motorista-dashboard.html"
   };
-  const primeiro = roles.find(r => rotas[r]);
-  const destino = primeiro ? rotas[primeiro] : "index.html";
-  Swal.fire({title:"Emular perfil?", text:`Você será redirecionado como ${primeiro ? primeiro.toUpperCase() : "N/D"}.`, icon:"question", showCancelButton:true, confirmButtonText:"Sim"}).then(r=>{
-    if(r.isConfirmed) window.location.href=`${destino}?emulando=${encodeURIComponent(email)}`;
+
+  const roles = Array.isArray(rolesEntrada) ? rolesEntrada.filter(Boolean) : (rolesEntrada ? String(rolesEntrada).split(",").map(s => s.trim()) : ["motorista"]);
+
+  if (roles.length === 1) {
+    const destino = rotas[roles[0]] || "index.html";
+    window.location.href = `${destino}?emulando=${encodeURIComponent(email)}`;
+    return;
+  }
+
+  const botoes = roles.map(r => `
+    <button class="swal-role-btn" data-role="${r}"
+      style="margin:8px; padding:10px 18px; border:none; border-radius:8px;
+             background:#004aad; color:white; font-weight:600; cursor:pointer;">
+      ${r.toUpperCase().replace("_"," ")}
+    </button>`).join("");
+
+  await Swal.fire({
+    title: "<b>Escolha o perfil para emular</b>",
+    html: botoes,
+    showConfirmButton: false,
+    didOpen: () => {
+      document.querySelectorAll(".swal-role-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const role = btn.getAttribute("data-role");
+          const destino = rotas[role] || "index.html";
+          window.location.href = `${destino}?emulando=${encodeURIComponent(email)}`;
+        });
+      });
+    },
+    width: 520,
+    background: "#f9fafc",
   });
 };
 </script>
+<!-- ===================== FIM — PARTE 2 ===================== -->
 </body>
 </html>
