@@ -5,20 +5,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Login - Sistema de Viaturas</title>
 
-<!-- 🧭 Manifest -->
+<!-- Ícone e Manifest -->
 <link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
 
-<!-- 📱 PWA iOS -->
+<!-- iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Viaturas">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 
-<!-- 🎨 Cores -->
+<!-- Cores -->
 <meta name="theme-color" content="#004aad">
 <meta name="background-color" content="#004aad">
 
-<link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/netcodebr/vtrteste/refs/heads/main/heraldica-8DN.png">
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <style>
 :root {
@@ -41,7 +43,7 @@ body{
 }
 .logo{width:90px;margin-bottom:15px;}
 h2{color:var(--azul-marinha);margin-bottom:25px;}
-input, select{
+input{
   width:100%;padding:12px;margin-bottom:14px;
   border:1px solid var(--borda);border-radius:8px;
   background-color:#f9fafb;font-size:15px;
@@ -65,6 +67,14 @@ p.hint a:hover{text-decoration:underline;}
 .update-banner{
   display:none;margin-top:20px;padding:10px;border-radius:8px;
   background:#0e1a2d;color:white;border:1px solid #2753a3;
+}
+.swal2-checkboxes label {
+  display: block;
+  padding: 4px 0;
+  font-size: 15px;
+}
+.swal2-popup {
+  border-radius: 12px !important;
 }
 </style>
 </head>
@@ -92,7 +102,7 @@ p.hint a:hover{text-decoration:underline;}
     </div>
   </div>
 
-<!-- 🔥 Registro do Service Worker -->
+<!-- Service Worker -->
 <script>
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js").then(reg => {
@@ -114,7 +124,7 @@ function atualizarAgora() {
 }
 </script>
 
-<!-- 🔐 Firebase Login com seleção de role -->
+<!-- Firebase Login + SweetAlert2 de múltiplas funções -->
 <script type="module">
 import { auth, db } from "./firebase-config.js";
 import {
@@ -124,21 +134,21 @@ import {
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
-// === Login com email/senha ===
+// ===== LOGIN COM EMAIL E SENHA =====
 window.login = async () => {
   const email = document.getElementById("email").value.trim();
   const senha = document.getElementById("senha").value;
-  if (!email || !senha) { alert("Preencha email e senha."); return; }
+  if (!email || !senha) return Swal.fire("Preencha todos os campos", "", "warning");
 
   try {
     const cred = await signInWithEmailAndPassword(auth, email, senha);
     await redirecionarUsuario(cred.user.uid);
   } catch (e) {
-    alert("Erro de login: " + (e.message || e));
+    Swal.fire("Erro de login", e.message, "error");
   }
 };
 
-// === Login com Google + seleção de role ===
+// ===== LOGIN COM GOOGLE =====
 document.getElementById("btnGoogle").addEventListener("click", async () => {
   try {
     const provider = new GoogleAuthProvider();
@@ -150,55 +160,93 @@ document.getElementById("btnGoogle").addEventListener("click", async () => {
     const snap = await getDoc(ref);
 
     if (!snap.exists()) {
-      // Novo usuário → escolher função
-      const role = prompt("Selecione sua função (motorista, auxiliar, encarregado, ose, chefe):")?.toLowerCase().trim();
-
-      const funcoesValidas = ["motorista", "auxiliar", "encarregado", "ose", "chefe"];
-      if (!funcoesValidas.includes(role)) {
-        alert("Função inválida ou não permitida!");
-        await auth.signOut();
-        return;
-      }
+      const roles = await escolherRolesComSwal(); // Seleção múltipla
 
       await setDoc(ref, {
         nome: user.displayName || "Usuário Google",
         email: user.email,
-        role: role,
+        roles,
         aprovado: false,
         criado_em: serverTimestamp()
       });
 
-      alert(`✅ Cadastro criado com sucesso!\nFunção: ${role}\nAguarde aprovação do administrador.`);
+      await Swal.fire({
+        icon: "success",
+        title: "Cadastro criado!",
+        html: `Funções selecionadas:<br><b>${roles.join(", ")}</b><br><br>Aguarde aprovação do administrador.`,
+        confirmButtonText: "OK",
+        confirmButtonColor: "#004aad"
+      });
       return;
     }
 
     const dados = snap.data();
-    if (!dados.aprovado) throw new Error("Usuário ainda não aprovado.");
-    await redirecionarUsuario(user.uid);
+    if (!dados.aprovado)
+      return Swal.fire("Aguardando aprovação", "Seu cadastro ainda não foi aprovado pelo administrador.", "info");
 
+    await redirecionarUsuario(user.uid);
   } catch (err) {
-    alert("Erro no login Google: " + (err.message || err));
     console.error(err);
+    Swal.fire("Erro", err.message || String(err), "error");
   }
 });
 
-// === Redirecionamento conforme função ===
+// ===== ESCOLHER FUNÇÕES (SweetAlert2 com múltiplas caixas) =====
+async function escolherRolesComSwal() {
+  const { value: roles } = await Swal.fire({
+    title: "Selecione suas funções",
+    html: `
+      <div class="swal2-checkboxes" style="text-align:left; line-height:1.9">
+        <label><input type="checkbox" class="role" value="motorista"> Motorista</label><br>
+        <label><input type="checkbox" class="role" value="auxiliar"> Auxiliar do Encarregado</label><br>
+        <label><input type="checkbox" class="role" value="encarregado"> Encarregado</label><br>
+        <label><input type="checkbox" class="role" value="ose"> OSE</label><br>
+        <label><input type="checkbox" class="role" value="chefe"> Chefe de Departamento</label>
+      </div>
+    `,
+    width: 520,
+    focusConfirm: false,
+    showCancelButton: true,
+    confirmButtonText: "Confirmar",
+    cancelButtonText: "Cancelar",
+    preConfirm: () => {
+      const selecionadas = Array.from(document.querySelectorAll(".role:checked")).map(i => i.value);
+      if (selecionadas.length === 0) {
+        Swal.showValidationMessage("Selecione pelo menos uma função");
+        return false;
+      }
+      if (selecionadas.includes("adm")) {
+        Swal.showValidationMessage("Função ADM é restrita");
+        return false;
+      }
+      return selecionadas;
+    }
+  });
+
+  if (!roles) throw new Error("Operação cancelada");
+  return roles;
+}
+
+// ===== REDIRECIONAMENTO =====
 async function redirecionarUsuario(uid) {
   const uDoc = await getDoc(doc(db, "usuarios", uid));
-  if (!uDoc.exists()) throw new Error("Usuário sem cadastro no Firestore.");
+  if (!uDoc.exists()) throw new Error("Usuário sem cadastro.");
   const u = uDoc.data();
   if (!u.aprovado) throw new Error("Usuário ainda não aprovado.");
 
-  const rota = {
+  const funcoes = Array.isArray(u.roles) ? u.roles : [u.role];
+  const rotas = {
     adm: "adm-dashboard.html",
     encarregado: "encarregado-dashboard.html",
     auxiliar: "aux-encarregado-dashboard.html",
     ose: "ose-dashboard.html",
     chefe: "chefe-dashboard.html",
     motorista: "motorista-dashboard.html"
-  }[u.role] || "index.html";
+  };
 
-  window.location.href = rota;
+  const primeira = funcoes.find(r => rotas[r]);
+  if (primeira) window.location.href = rotas[primeira];
+  else window.location.href = "index.html";
 }
 </script>
 </body>
