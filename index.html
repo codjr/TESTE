@@ -68,14 +68,6 @@ p.hint a:hover{text-decoration:underline;}
   display:none;margin-top:20px;padding:10px;border-radius:8px;
   background:#0e1a2d;color:white;border:1px solid #2753a3;
 }
-.swal2-checkboxes label {
-  display: block;
-  padding: 4px 0;
-  font-size: 15px;
-}
-.swal2-popup {
-  border-radius: 12px !important;
-}
 </style>
 </head>
 
@@ -191,24 +183,85 @@ document.getElementById("btnGoogle").addEventListener("click", async () => {
   }
 });
 
-// ===== ESCOLHER FUNÇÕES (SweetAlert2 com múltiplas caixas) =====
+// ===== SWEETALERT2 ESTILIZADO (MÚLTIPLAS FUNÇÕES) =====
 async function escolherRolesComSwal() {
   const { value: roles } = await Swal.fire({
-    title: "Selecione suas funções",
+    title: '<span style="color:#004aad;font-weight:700;">Selecione suas funções</span>',
     html: `
-      <div class="swal2-checkboxes" style="text-align:left; line-height:1.9">
-        <label><input type="checkbox" class="role" value="motorista"> Motorista</label><br>
-        <label><input type="checkbox" class="role" value="auxiliar"> Auxiliar do Encarregado</label><br>
-        <label><input type="checkbox" class="role" value="encarregado"> Encarregado</label><br>
-        <label><input type="checkbox" class="role" value="ose"> OSE</label><br>
-        <label><input type="checkbox" class="role" value="chefe"> Chefe de Departamento</label>
+      <style>
+        .swal2-popup.custom-modal {
+          border-radius: 14px !important;
+          background: linear-gradient(180deg, #f9fafc, #eef3f9);
+          box-shadow: 0 0 25px rgba(0,0,0,0.2);
+        }
+        .funcoes-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px 25px;
+          text-align: left;
+          margin-top: 10px;
+        }
+        .funcoes-item {
+          background: white;
+          border: 2px solid #cbd5e1;
+          border-radius: 10px;
+          padding: 10px 14px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          transition: 0.25s;
+        }
+        .funcoes-item:hover {
+          border-color: #004aad;
+          background: #f0f7ff;
+          transform: translateY(-1px);
+        }
+        .funcoes-item input {
+          width: 18px;
+          height: 18px;
+          accent-color: #004aad;
+          cursor: pointer;
+        }
+        .funcoes-item label {
+          font-size: 15px;
+          color: #1e293b;
+          cursor: pointer;
+        }
+        .swal2-confirm.custom-confirm {
+          background-color: #004aad !important;
+          color: #fff !important;
+          font-weight: 600 !important;
+          border-radius: 8px !important;
+          padding: 10px 0 !important;
+        }
+        .swal2-cancel.custom-cancel {
+          background-color: #64748b !important;
+          color: #fff !important;
+          font-weight: 600 !important;
+          border-radius: 8px !important;
+          padding: 10px 0 !important;
+        }
+      </style>
+
+      <div class="funcoes-grid">
+        <div class="funcoes-item"><input type="checkbox" class="role" value="motorista" id="rMotorista"><label for="rMotorista">🚗 Motorista</label></div>
+        <div class="funcoes-item"><input type="checkbox" class="role" value="auxiliar" id="rAux"><label for="rAux">🧾 Auxiliar do Encarregado</label></div>
+        <div class="funcoes-item"><input type="checkbox" class="role" value="encarregado" id="rEnc"><label for="rEnc">🧭 Encarregado</label></div>
+        <div class="funcoes-item"><input type="checkbox" class="role" value="ose" id="rOSE"><label for="rOSE">📜 OSE</label></div>
+        <div class="funcoes-item"><input type="checkbox" class="role" value="chefe" id="rChefe"><label for="rChefe">⚓ Chefe de Departamento</label></div>
       </div>
     `,
-    width: 520,
-    focusConfirm: false,
+    width: 600,
+    background: "#ffffff",
+    customClass: {
+      popup: "custom-modal",
+      confirmButton: "custom-confirm",
+      cancelButton: "custom-cancel"
+    },
     showCancelButton: true,
     confirmButtonText: "Confirmar",
     cancelButtonText: "Cancelar",
+    focusConfirm: false,
     preConfirm: () => {
       const selecionadas = Array.from(document.querySelectorAll(".role:checked")).map(i => i.value);
       if (selecionadas.length === 0) {
