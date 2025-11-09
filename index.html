@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Login - Sistema de Viaturas</title>
+
+<!-- 🧭 Manifest -->
+<link rel="manifest" href="manifest.webmanifest">
+
+<!-- 📱 PWA iOS -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Viaturas">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+
+<!-- 🎨 Cores -->
+<meta name="theme-color" content="#004aad">
+<meta name="background-color" content="#004aad">
+
+<link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/netcodebr/vtrteste/refs/heads/main/heraldica-8DN.png">
+
+<style>
+:root {
+  --azul-marinha:#004aad; --azul-hover:#003b8e;
+  --fundo:#f5f7fa; --texto:#1f2937;
+  --branco:#ffffff; --borda:#d1d5db;
+  --sombra:rgba(0,0,0,0.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",Roboto,Arial,sans-serif;}
+body{
+  background:linear-gradient(135deg,var(--azul-marinha),#0a58ca);
+  display:flex;justify-content:center;align-items:center;
+  min-height:100vh;padding:20px;
+}
+.card{
+  background:var(--branco);border-radius:12px;
+  box-shadow:0 6px 20px var(--sombra);
+  padding:40px 30px;text-align:center;
+  max-width:380px;width:100%;
+}
+.logo{width:90px;margin-bottom:15px;}
+h2{color:var(--azul-marinha);margin-bottom:25px;}
+input, select{
+  width:100%;padding:12px;margin-bottom:14px;
+  border:1px solid var(--borda);border-radius:8px;
+  background-color:#f9fafb;font-size:15px;
+}
+button{
+  width:100%;padding:12px;border:none;border-radius:8px;
+  font-size:16px;font-weight:600;cursor:pointer;
+  margin-top:5px;transition:background 0.3s;
+}
+button.primary{background-color:var(--azul-marinha);color:var(--branco);}
+button.primary:hover{background-color:var(--azul-hover);}
+button.google{
+  background:#fff;border:1px solid #dadce0;color:#3c4043;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  margin-top:10px;
+}
+button.google img{width:20px;height:20px;}
+p.hint{margin-top:16px;font-size:14px;}
+p.hint a{color:var(--azul-marinha);text-decoration:none;font-weight:500;}
+p.hint a:hover{text-decoration:underline;}
+.update-banner{
+  display:none;margin-top:20px;padding:10px;border-radius:8px;
+  background:#0e1a2d;color:white;border:1px solid #2753a3;
+}
+</style>
+</head>
+
+<body>
+  <div class="card">
+    <img class="logo" src="https://raw.githubusercontent.com/netcodebr/vtrteste/refs/heads/main/heraldica-8DN.png" alt="Marinha do Brasil">
+    <h2>Sistema de Viaturas</h2>
+
+    <input type="email" id="email" placeholder="Email institucional" required />
+    <input type="password" id="senha" placeholder="Senha" required />
+    <button class="primary" onclick="login()">Entrar</button>
+
+    <div style="margin:12px 0;font-size:14px;color:#555;">ou</div>
+    <button class="google" id="btnGoogle">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
+      Entrar com Google
+    </button>
+
+    <p class="hint"><a href="cadastro.html">Não tem cadastro? Clique aqui</a></p>
+
+    <div id="updateBanner" class="update-banner">
+      🚀 Nova versão disponível! 
+      <button onclick="atualizarAgora()" style="background:#004aad;color:white;border:none;padding:5px 10px;border-radius:4px;">Atualizar</button>
+    </div>
+  </div>
+
+<!-- 🔥 Registro do Service Worker -->
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js").then(reg => {
+    reg.addEventListener("updatefound", () => {
+      const novo = reg.installing;
+      novo.addEventListener("statechange", () => {
+        if (novo.state === "installed" && navigator.serviceWorker.controller) {
+          document.getElementById("updateBanner").style.display = "block";
+        }
+      });
+    });
+  });
+}
+function atualizarAgora() {
+  navigator.serviceWorker.getRegistration().then(r => {
+    if (r && r.waiting) r.waiting.postMessage("SKIP_WAITING");
+  });
+  location.reload();
+}
+</script>
+
+<!-- 🔐 Firebase Login com seleção de role -->
+<script type="module">
+import { auth, db } from "./firebase-config.js";
+import {
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+import { doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+// === Login com email/senha ===
+window.login = async () => {
+  const email = document.getElementById("email").value.trim();
+  const senha = document.getElementById("senha").value;
+  if (!email || !senha) { alert("Preencha email e senha."); return; }
+
+  try {
+    const cred = await signInWithEmailAndPassword(auth, email, senha);
+    await redirecionarUsuario(cred.user.uid);
+  } catch (e) {
+    alert("Erro de login: " + (e.message || e));
+  }
+};
+
+// === Login com Google + seleção de role ===
+document.getElementById("btnGoogle").addEventListener("click", async () => {
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
+
+    const ref = doc(db, "usuarios", user.uid);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      // Novo usuário → escolher função
+      const role = prompt("Selecione sua função (motorista, auxiliar, encarregado, ose, chefe):")?.toLowerCase().trim();
+
+      const funcoesValidas = ["motorista", "auxiliar", "encarregado", "ose", "chefe"];
+      if (!funcoesValidas.includes(role)) {
+        alert("Função inválida ou não permitida!");
+        await auth.signOut();
+        return;
+      }
+
+      await setDoc(ref, {
+        nome: user.displayName || "Usuário Google",
+        email: user.email,
+        role: role,
+        aprovado: false,
+        criado_em: serverTimestamp()
+      });
+
+      alert(`✅ Cadastro criado com sucesso!\nFunção: ${role}\nAguarde aprovação do administrador.`);
+      return;
+    }
+
+    const dados = snap.data();
+    if (!dados.aprovado) throw new Error("Usuário ainda não aprovado.");
+    await redirecionarUsuario(user.uid);
+
+  } catch (err) {
+    alert("Erro no login Google: " + (err.message || err));
+    console.error(err);
+  }
+});
+
+// === Redirecionamento conforme função ===
+async function redirecionarUsuario(uid) {
+  const uDoc = await getDoc(doc(db, "usuarios", uid));
+  if (!uDoc.exists()) throw new Error("Usuário sem cadastro no Firestore.");
+  const u = uDoc.data();
+  if (!u.aprovado) throw new Error("Usuário ainda não aprovado.");
+
+  const rota = {
+    adm: "adm-dashboard.html",
+    encarregado: "encarregado-dashboard.html",
+    auxiliar: "aux-encarregado-dashboard.html",
+    ose: "ose-dashboard.html",
+    chefe: "chefe-dashboard.html",
+    motorista: "motorista-dashboard.html"
+  }[u.role] || "index.html";
+
+  window.location.href = rota;
+}
+</script>
+</body>
+</html>
