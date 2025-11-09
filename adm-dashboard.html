@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Administrador - Dashboard</title>
-<link rel="icon" type="image/png" href="https://logodownload.org/wp-content/uploads/2018/01/marinha-brasil-logo-0.png">
+<link rel="icon" type="image/png" href="https://raw.githubusercontent.com/netcodebr/vtrteste/refs/heads/main/heraldica-8DN.png">
 
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -15,7 +15,6 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <style>
-  
 /* =======================
    RESET + BASE
 ======================= */
@@ -93,7 +92,6 @@ button.primary { background:#002b5c; color:#fff; }
   table th, table td { font-size:0.85rem; padding:8px; }
   .grid { grid-template-columns:1fr; }
 }
-
 </style>
 </head>
 
@@ -101,7 +99,7 @@ button.primary { background:#002b5c; color:#fff; }
 <div class="container">
   <header>
     <div class="logo-marinha">
-      <img src="https://logodownload.org/wp-content/uploads/2018/01/marinha-brasil-logo-0.png" alt="Marinha do Brasil">
+      <img src="https://raw.githubusercontent.com/netcodebr/vtrteste/refs/heads/main/heraldica-8DN.png" alt="Marinha do Brasil">
       <h1>Administrador — Sistema de Viaturas</h1>
     </div>
     <button onclick="logout()">Sair</button>
@@ -122,12 +120,12 @@ button.primary { background:#002b5c; color:#fff; }
   </div>
 
   <!-- ======== Usuários (6 grupos) ======== -->
-  <section id="tab-adm" class="tab-pane" style="display:block;"><h2>Usuários ADM (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-adm"></tbody></table></div></section>
-  <section id="tab-chefe" class="tab-pane" style="display:none;"><h2>Usuários Chefes (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-chefe"></tbody></table></div></section>
-  <section id="tab-ose" class="tab-pane" style="display:none;"><h2>Usuários OSE (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-ose"></tbody></table></div></section>
-  <section id="tab-encarregado" class="tab-pane" style="display:none;"><h2>Usuários Encarregados (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-encarregado"></tbody></table></div></section>
-  <section id="tab-aux" class="tab-pane" style="display:none;"><h2>Usuários Auxiliares (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-aux"></tbody></table></div></section>
-  <section id="tab-motorista" class="tab-pane" style="display:none;"><h2>Usuários Motoristas (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargo</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-motorista"></tbody></table></div></section>
+  <section id="tab-adm" class="tab-pane" style="display:block;"><h2>Usuários ADM (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-adm"></tbody></table></div></section>
+  <section id="tab-chefe" class="tab-pane" style="display:none;"><h2>Usuários Chefes (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-chefe"></tbody></table></div></section>
+  <section id="tab-ose" class="tab-pane" style="display:none;"><h2>Usuários OSE (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-ose"></tbody></table></div></section>
+  <section id="tab-encarregado" class="tab-pane" style="display:none;"><h2>Usuários Encarregados (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-encarregado"></tbody></table></div></section>
+  <section id="tab-aux" class="tab-pane" style="display:none;"><h2>Usuários Auxiliares (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-aux"></tbody></table></div></section>
+  <section id="tab-motorista" class="tab-pane" style="display:none;"><h2>Usuários Motoristas (0)</h2><div class="table-wrap"><table><thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Status</th><th>Ações</th></tr></thead><tbody id="usuarios-motorista"></tbody></table></div></section>
 
   <!-- ======== Missões ======== -->
   <section id="tab-missoes" class="tab-pane" style="display:none;">
@@ -203,7 +201,7 @@ button.primary { background:#002b5c; color:#fff; }
     <h2>Emulação de Perfil</h2>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Nome</th><th>Email</th><th>Cargo</th><th>Ação</th></tr></thead>
+        <thead><tr><th>Nome</th><th>Email</th><th>Cargos</th><th>Ação</th></tr></thead>
         <tbody id="emulacao-body"></tbody>
       </table>
     </div>
@@ -222,13 +220,15 @@ const LIMITE = 10*60*1000; let t;
 onAuthStateChanged(auth, async (u)=>{
   if(!u){ return window.location.href="index.html"; }
   const uDoc = await getDoc(doc(db,"usuarios", u.uid));
-  if(!uDoc.exists() || uDoc.data().role!=="adm"){
+  const data = uDoc.exists() ? uDoc.data() : null;
+  const roles = data ? (Array.isArray(data.roles) ? data.roles.map(r=>String(r).toLowerCase()) : [String(data.role||"").toLowerCase()]) : [];
+  if(!data || (!roles.includes("adm"))){
     await signOut(auth); window.location.href="index.html"; return;
   }
   await carregarPermissoes();
   init();
   reset();
-  ["mousemove","keydown","click","scroll"].forEach(e=>document.addEventListener(e, reset));
+  ["mousemove","keydown","click","scroll","touchstart"].forEach(e=>document.addEventListener(e, reset));
 });
 function reset(){ clearTimeout(t); t=setTimeout(async()=>{ await signOut(auth); window.location.href="index.html"; }, LIMITE); }
 window.logout = async()=>{ await signOut(auth); window.location.href="index.html"; };
@@ -253,8 +253,6 @@ async function logAction(acao, alvo, extra={}) {
 
 /* =======================
    PERMISSÕES (AVANÇADO)
-   - Default permissões (permitido)
-   - Pode ser sobrescrito via doc Firestore: config/permissoes
 ======================= */
 let PERMISSOES = {
   usuarios: { aprovar:true, desaprovar:true, editar:true, resetar:true, excluir:true },
@@ -266,7 +264,6 @@ async function carregarPermissoes(){
     const cfg = await getDoc(doc(db,"config","permissoes"));
     if(cfg.exists()){
       const data = cfg.data();
-      // mescla sem remover chaves ausentes
       PERMISSOES = {
         usuarios: { ...PERMISSOES.usuarios, ...(data.usuarios||{}) },
         missoes:  { ...PERMISSOES.missoes,  ...(data.missoes||{}) },
@@ -300,7 +297,7 @@ function init(){
 /* =======================
    USUÁRIOS (SEPARADO POR ROLE + CONTAGEM)
 ======================= */
-function carregarUsuarios() {
+function carregarUsuarios(){
   const grupos = {
     adm:         { tbody: document.getElementById("usuarios-adm"),         titulo: "Usuários ADM" },
     chefe:       { tbody: document.getElementById("usuarios-chefe"),       titulo: "Usuários Chefes" },
@@ -310,17 +307,17 @@ function carregarUsuarios() {
     motorista:   { tbody: document.getElementById("usuarios-motorista"),   titulo: "Usuários Motoristas" }
   };
 
-  onSnapshot(collection(db, "usuarios"), (snap) => {
-    const count = { adm: 0, chefe: 0, ose: 0, encarregado: 0, aux: 0, motorista: 0 };
-    Object.values(grupos).forEach(g => g.tbody.innerHTML = "");
+  onSnapshot(collection(db,"usuarios"),(snap)=>{
+    const count = { adm:0, chefe:0, ose:0, encarregado:0, aux:0, motorista:0 };
+    Object.values(grupos).forEach(g=>g.tbody.innerHTML="");
 
-    snap.forEach(d => {
+    snap.forEach(d=>{
       const u = d.data();
 
-      // ✅ Suporte a role (string) e roles (array)
+      // ✅ Suporte a 'role' (string) e 'roles' (array)
       const cargos = Array.isArray(u.roles)
-        ? u.roles.map(r => r.toLowerCase())
-        : [(u.role || "").toLowerCase()];
+        ? u.roles.map(r => String(r).toLowerCase())
+        : [String(u.role||"").toLowerCase()];
 
       let grupo = null;
       if (cargos.includes("adm")) grupo = "adm";
@@ -329,38 +326,28 @@ function carregarUsuarios() {
       else if (cargos.includes("encarregado")) grupo = "encarregado";
       else if (cargos.includes("aux_encarregado") || cargos.includes("aux")) grupo = "aux";
       else if (cargos.includes("motorista")) grupo = "motorista";
-      if (!grupo) return;
+      if(!grupo) return;
 
       count[grupo]++;
+      const cargosTexto = Array.isArray(u.roles) ? u.roles.join(", ") : (u.role || "-");
 
       const aAprovar   = can("usuarios.aprovar")   ? `<button class="aprovar"   onclick="aprovar('${d.id}')">✔ Aprovar</button>` : "";
       const aDesaprovar= can("usuarios.desaprovar")? `<button class="desaprovar" onclick="desaprovar('${d.id}')">✖ Desaprovar</button>` : "";
-      const aEditar    = can("usuarios.editar")    ? `<button class="editar"    onclick="editarUsuario('${d.id}','${(u.nome||'').replace(/\"/g,'&quot;')}','${(u.role || (u.roles ? u.roles.join(', ') : ''))}')">✏ Editar</button>` : "";
+      const aEditar    = can("usuarios.editar")    ? `<button class="editar"    onclick="editarUsuario('${d.id}','${(u.nome||'').replace(/\"/g,'&quot;')}','${cargosTexto.replace(/\"/g,'&quot;')}')">✏ Editar</button>` : "";
       const aReset     = can("usuarios.resetar")   ? `<button class="reset"     onclick="resetSenha('${u.email||''}')">🔁 Resetar Senha</button>` : "";
       const aExcluir   = can("usuarios.excluir")   ? `<button class="excluir"   onclick="excluirUsuario('${d.id}')">🗑 Excluir</button>` : "";
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${u.nome || "-"}</td>
-        <td>${u.email || "-"}</td>
-        <td>${(Array.isArray(u.roles) ? u.roles.join(", ") : (u.role || "-"))}</td>
-        <td>${u.aprovado
-          ? '<span class="badge-ok">Aprovado</span>'
-          : '<span class="badge-no">Pendente</span>'}</td>
+        <td>${u.nome||"-"}</td>
+        <td>${u.email||"-"}</td>
+        <td>${cargosTexto}</td>
+        <td>${u.aprovado?'<span class="badge-ok">Aprovado</span>':'<span class="badge-no">Pendente</span>'}</td>
         <td class="actions">
           ${aAprovar}${aDesaprovar}${aEditar}${aReset}${aExcluir}
         </td>`;
       grupos[grupo].tbody.appendChild(tr);
     });
-
-    // Atualiza títulos com contagem
-    for (const [k, g] of Object.entries(grupos)) {
-      const h2 = g.tbody.closest("section").querySelector("h2");
-      h2.textContent = `${g.titulo} (${count[k]})`;
-    }
-  });
-}
-
 
     // Atualiza títulos com contagem
     for(const [k,g] of Object.entries(grupos)){
@@ -387,25 +374,95 @@ window.desaprovar = async(uid)=>{
   await logAction("Desaprovar usuário", uid);
   Swal.fire("Usuário desaprovado!","","info");
 };
-window.editarUsuario = async(uid,nomeAtual,cargoAtual)=>{
+
+/* ===== EDITAR USUÁRIO (múltiplas funções; bloqueia ADM) ===== */
+window.editarUsuario = async(uid,nomeAtual,cargosAtuaisTexto="")=>{
   if(!can("usuarios.editar")) return Swal.fire("Sem permissão","Ação não permitida.","error");
+
+  // Normaliza roles atuais
+  const rolesAtuais = cargosAtuaisTexto
+    ? cargosAtuaisTexto.split(",").map(r => r.trim().toLowerCase()).filter(Boolean)
+    : [];
+
+  // Se o usuário-alvo já é ADM, bloquear edição de roles (apenas nome)
+  const isAlvoADM = rolesAtuais.includes("adm");
+
+  const roleGridHTML = isAlvoADM
+    ? `<div style="margin-top:8px; padding:10px; border-radius:8px; background:#fff3cd; color:#7a5b00; border:1px solid #ffe08a;">
+         ⚠ Este usuário possui o papel <b>ADM</b>. As funções não podem ser alteradas aqui.
+       </div>`
+    : `
+      <div class="funcoes-grid" style="margin-top:10px">
+        <div class="funcoes-item"><input type="checkbox" class="role" value="motorista" id="rMotorista"><label for="rMotorista">🚗 Motorista</label></div>
+        <div class="funcoes-item"><input type="checkbox" class="role" value="aux_encarregado" id="rAux"><label for="rAux">🧾 Auxiliar do Encarregado</label></div>
+        <div class="funcoes-item"><input type="checkbox" class="role" value="encarregado" id="rEnc"><label for="rEnc">🧭 Encarregado</label></div>
+        <div class="funcoes-item"><input type="checkbox" class="role" value="ose" id="rOSE"><label for="rOSE">📜 OSE</label></div>
+        <div class="funcoes-item"><input type="checkbox" class="role" value="chefe" id="rChefe"><label for="rChefe">⚓ Chefe de Departamento</label></div>
+      </div>
+    `;
+
   const { value: formValues } = await Swal.fire({
-    title:"Editar usuário",
-    html:`<input id="swal-nome" class="swal2-input" placeholder="Nome" value="${nomeAtual}">
-          <input id="swal-cargo" class="swal2-input" placeholder="Cargo (adm, chefe, ose, encarregado, aux_encarregado, motorista)" value="${cargoAtual}">`,
-    focusConfirm:false, showCancelButton:true, confirmButtonText:"✏ Salvar",
-    preConfirm:()=>{
+    title:'<span style="color:#004aad;font-weight:700;">Editar Usuário</span>',
+    html: `
+      <style>
+        .swal2-popup.custom-modal { border-radius: 14px !important; background: linear-gradient(180deg, #f9fafc, #eef3f9); box-shadow: 0 0 25px rgba(0,0,0,0.2); }
+        .funcoes-item { background: white; border: 2px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; transition: 0.25s; }
+        .funcoes-item:hover { border-color: #004aad; background: #f0f7ff; transform: translateY(-1px); }
+        .funcoes-item input { width: 18px; height: 18px; accent-color: #004aad; cursor: pointer; }
+        .funcoes-item label { font-size: 15px; color: #1e293b; cursor: pointer; }
+        .swal2-confirm.custom-confirm { background-color: #004aad !important; color: #fff !important; font-weight: 600 !important; border-radius: 8px !important; padding: 10px 0 !important; }
+        .swal2-cancel.custom-cancel { background-color: #64748b !important; color: #fff !important; font-weight: 600 !important; border-radius: 8px !important; padding: 10px 0 !important; }
+        .funcoes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 25px; text-align: left; }
+      </style>
+
+      <input id="swal-nome" class="swal2-input" placeholder="Nome completo" value="${(nomeAtual||"").replace(/"/g,'&quot;')}" />
+      ${roleGridHTML}
+    `,
+    width: 620,
+    background: "#ffffff",
+    customClass: { popup: "custom-modal", confirmButton: "custom-confirm", cancelButton: "custom-cancel" },
+    showCancelButton: true,
+    confirmButtonText: "💾 Salvar",
+    cancelButtonText: "Cancelar",
+    focusConfirm: false,
+    didOpen: () => {
+      if (!isAlvoADM) {
+        // Marca os roles atuais (exceto 'adm' que nem aparece)
+        document.querySelectorAll(".role").forEach((cb) => {
+          if (rolesAtuais.includes(cb.value)) cb.checked = true;
+        });
+      }
+    },
+    preConfirm: () => {
       const nome = document.getElementById("swal-nome").value.trim();
-      const cargo = document.getElementById("swal-cargo").value.trim();
-      if(!nome||!cargo){ Swal.showValidationMessage("Preencha todos os campos corretamente."); return false; }
-      return { nome, cargo };
-    }
+      if (!nome) { Swal.showValidationMessage("Preencha o nome corretamente."); return false; }
+
+      if (isAlvoADM) {
+        // Não alteramos roles de um usuário que já é ADM (somente nome)
+        return { nome, roles: rolesAtuais };
+      }
+
+      const selecionadas = Array.from(document.querySelectorAll(".role:checked")).map(i => i.value);
+      if (selecionadas.length === 0) { Swal.showValidationMessage("Selecione pelo menos uma função."); return false; }
+      if (selecionadas.includes("adm")) { Swal.showValidationMessage("Função ADM é restrita."); return false; }
+
+      return { nome, roles: selecionadas };
+    },
   });
-  if(!formValues) return;
-  await updateDoc(doc(db,"usuarios",uid), { nome:formValues.nome, role:formValues.cargo });
-  await logAction("Editar usuário", uid, { nome:formValues.nome, role:formValues.cargo });
-  Swal.fire("✏ Usuário atualizado!","","success");
+
+  if (!formValues) return;
+
+  // Atualiza o documento no Firestore (mantém compatibilidade com dashboards antigos usando 'role')
+  await updateDoc(doc(db,"usuarios",uid), {
+    nome: formValues.nome,
+    roles: formValues.roles,
+    role: formValues.roles[0] || null
+  });
+
+  await logAction("Editar usuário", uid, { nome: formValues.nome, roles: formValues.roles });
+  Swal.fire("✅ Usuário atualizado!", "", "success");
 };
+
 window.resetSenha = async(email)=>{
   if(!can("usuarios.resetar")) return Swal.fire("Sem permissão","Ação não permitida.","error");
   if(!email) return Swal.fire("Erro","Usuário sem e-mail cadastrado.","error");
@@ -427,11 +484,6 @@ window.excluirUsuario = async(uid)=>{
    MISSÕES + CONTAGEM
 ======================= */
 let MISSOES_CACHE = [];
-onSnapshot(query(collection(db,"logs"),orderBy("data_hora","desc")),(snap)=>{
-  const tbody=document.getElementById("logs-body"); if(!tbody) return;
-  tbody.innerHTML=""; snap.forEach(d=>{const l=d.data();const row={acao:l.acao||"",alvo:l.alvo||"",feito:l.feito_por_email||"",data:l.data_hora?.toDate?l.data_hora.toDate().toLocaleString():""};const tr=document.createElement("tr");tr.innerHTML=`<td>${row.acao}</td><td>${row.alvo}</td><td>${row.feito}</td><td>${row.data}</td>`;tbody.appendChild(tr);});
-});
-
 function carregarMissoesRealtime(){
   onSnapshot(collection(db,"viaturas_missao"),(snap)=>{
     MISSOES_CACHE=[]; snap.forEach(d=>MISSOES_CACHE.push({id:d.id,...d.data()}));
@@ -460,11 +512,9 @@ function renderMissoes(list){
       <td class="actions">${aEditar}${aStatus}</td>`;
     tbody.appendChild(tr);
   });
-  // contagem no título
   const t = document.getElementById("titulo-missoes");
   if(t) t.textContent = `Missões (${list.length})`;
 }
-
 window.editarMissao = async(id)=>{
   if(!can("missoes.editar")) return Swal.fire("Sem permissão","Ação não permitida.","error");
   const ref=doc(db,"viaturas_missao",id); const d=await getDoc(ref);
@@ -509,14 +559,12 @@ function aggregateByMotorista(missoes){
     const k=(m.motorista||"Sem motorista").trim()||"Sem motorista";
     map.set(k,(map.get(k)||0)+1);
   });
-  // Ordena e limita top 10 + "Outros"
   const arr=[...map.entries()].sort((a,b)=>b[1]-a[1]);
   const top=arr.slice(0,10);
   const outrosCount=arr.slice(10).reduce((s,[_k,v])=>s+v,0);
   if(outrosCount>0) top.push(["Outros", outrosCount]);
   return { labels: top.map(x=>x[0]), data: top.map(x=>x[1]) };
 }
-
 function aggregateByStatus(missoes){
   const map=new Map();
   missoes.forEach(m=>{
@@ -526,7 +574,6 @@ function aggregateByStatus(missoes){
   const arr=[...map.entries()].sort((a,b)=>b[1]-a[1]);
   return { labels: arr.map(x=>x[0]), data: arr.map(x=>x[1]) };
 }
-
 function updateCharts(missoes){
   // Motoristas
   const mAgg=aggregateByMotorista(missoes);
@@ -623,16 +670,28 @@ function carregarEmulacaoRealtime(){
     tbody.innerHTML="";
     snap.forEach(d=>{
       const u=d.data();
+      const cargosTexto = Array.isArray(u.roles) ? u.roles.join(", ") : (u.role || "-");
       const tr=document.createElement("tr");
-      tr.innerHTML=`<td>${u.nome||"-"}</td><td>${u.email||"-"}</td><td>${u.role||"-"}</td><td><button class="editar" onclick="emularPerfil('${u.email||''}','${u.role||''}')">Emular</button></td>`;
+      tr.innerHTML=`<td>${u.nome||"-"}</td><td>${u.email||"-"}</td><td>${cargosTexto}</td><td><button class="editar" onclick="emularPerfil('${u.email||''}','${cargosTexto.replace(/\"/g,'&quot;')}')">Emular</button></td>`;
       tbody.appendChild(tr);
     });
   });
 }
-window.emularPerfil=(email,role)=>{
-  if(!email||!role) return Swal.fire("Erro","Usuário inválido.","error");
-  const destino=({adm:"adm-dashboard.html",chefe:"chefe-dashboard.html",ose:"ose-dashboard.html",encarregado:"encarregado-dashboard.html",motorista:"motorista-dashboard.html",aux_encarregado:"aux-encarregado-dashboard.html"}[role]||"index.html");
-  Swal.fire({title:"Emular perfil?", text:`Você será redirecionado como ${role.toUpperCase()}.`, icon:"question", showCancelButton:true, confirmButtonText:"Sim"}).then(r=>{
+window.emularPerfil=(email,cargosTexto)=>{
+  if(!email) return Swal.fire("Erro","Usuário inválido.","error");
+  const roles = cargosTexto.split(",").map(r=>r.trim().toLowerCase());
+  const rotas = {
+    adm:"adm-dashboard.html",
+    chefe:"chefe-dashboard.html",
+    ose:"ose-dashboard.html",
+    encarregado:"encarregado-dashboard.html",
+    motorista:"motorista-dashboard.html",
+    "aux_encarregado":"aux-encarregado-dashboard.html",
+    aux:"aux-encarregado-dashboard.html"
+  };
+  const primeiro = roles.find(r => rotas[r]);
+  const destino = primeiro ? rotas[primeiro] : "index.html";
+  Swal.fire({title:"Emular perfil?", text:`Você será redirecionado como ${primeiro ? primeiro.toUpperCase() : "N/D"}.`, icon:"question", showCancelButton:true, confirmButtonText:"Sim"}).then(r=>{
     if(r.isConfirmed) window.location.href=`${destino}?emulando=${encodeURIComponent(email)}`;
   });
 };
