@@ -1,7 +1,7 @@
 {
   "hosting": {
     "site": "vtr-marinha",
-    "public": ".",
+    "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
